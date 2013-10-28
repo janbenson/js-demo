@@ -29,8 +29,8 @@
     <div class="form-group">
       <label for="member_dob" class="col-lg-2 control-label">Test?</label>
       <div class="col-lg-10">
-        <input type="radio" name="test" id="test_yes" value="true"> Yes
-        <input type="radio" name="test" id="test_no" value="false" checked> No
+        <input type="radio" name="test" id="test_yes" value="true" checked="checked"> Yes
+        <input type="radio" name="test" id="test_no" value="false"> No
       </div>
     </div>
 
@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div class="form-group test-param" style="display: none;">
+    <div class="form-group test-param">
       <label for="test_member_id" class="col-lg-2 control-label">Test Member ID</label>
       <div class="col-lg-10">
         <select class="form-control" id="test_member_id">
@@ -61,14 +61,14 @@
       </div>
     </div>
 
-    <div class="form-group real-param">
+    <div class="form-group real-param" style="display: none;">
       <label for="payer_id" class="col-lg-2 control-label">Payer ID</label>
       <div class="col-lg-10">
         <input type="text" class="form-control" id="payer_id">
       </div>
     </div>
 
-    <fieldset class="real-param">
+    <fieldset class="real-param" style="display: none;">
       <legend>Service Provider</legend>
 
       <div class="form-group real-param">
@@ -94,7 +94,7 @@
 
     </fieldset>
 
-    <fieldset class="real-param">
+    <fieldset class="real-param" style="display: none;">
       <legend>Subscriber</legend>
 
       <div class="form-group real-param">
