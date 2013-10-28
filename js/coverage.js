@@ -140,7 +140,7 @@ fetchTestCoverage = function() {
     params['test'] = 'true';
     params['member_id'] = params['test_member_id'];
     delete params['test_member_id'];
-    params['provider_npi'] = params['provider_last_name'] = params['provider_first_name'] = params['member_id'] =
+    params['provider_npi'] = params['provider_last_name'] = params['provider_first_name'] =
       params['member_last_name'] = params['member_first_name'] = '1234567890';
     params['payer_id'] = '00001';
     params['member_dob'] = '1981-01-01';
