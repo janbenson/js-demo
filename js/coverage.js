@@ -1,10 +1,22 @@
 coverage_url = "https://gds.eligibleapi.com/v1.1/coverage/all.json"
 
+showForm = function() {
+  $(".test-param").hide();
+  $(".real-param").show();
+}
+
+showTest = function() {
+  $(".real-param").hide();
+  $(".test-param").show();
+}
+
 errorCallback = function(xhr, textStatus, errorThrown) {
   window.alert("Error on request: " + errorThrown);
 }
 
 successCallback = function(data) {
+  $(".has-error").removeClass("has-error");
+
   $(".eligible-plugin-coverage-template").remove();
   if (data.error) {
     buildError(data.error);
@@ -53,37 +65,89 @@ coverageRequest = function(params) {
 
 
 $(document).ready(function() {
+  if ($("input[name=test]:checked").val() == "true") {
+    showTest();
+  } else {
+    showForm();
+  }
+
+  $("input[name=test]").on('click', function() {
+    if ($(this).val() == 'true') {
+      showTest();
+    } else {
+      showForm();
+    }
+  });
+
   $(".form-coverage").on('submit', function(e) {
     e.preventDefault();
 
-    var params = {
-      api_key: $("#api_key").val(),
-      payer_id: $("#payer_id").val(),
-      provider_npi: $("#provider_npi").val(),
-      provider_last_name: $("#provider_last_name").val(),
-      provider_first_name: $("#provider_first_name").val(),
-      member_id: $("#member_id").val(),
-      member_first_name: $("#member_first_name").val(),
-      member_last_name: $("#member_last_name").val(),
-      member_dob: $("#member_dob").val(),
-      test: $("input[name=test]:checked").val()
-    };
+    var test = $("input[name=test]:checked").val();
 
-    $.each(params, function(key) {
-      if ((params[key] === undefined) || (params[key].match(/^\s*$/))) {
-        $("#" + key).closest('.form-group').addClass('has-error');
-      } else {
-        $("#" + key).closest('.form-group').removeClass('has-error');
-      }
-    });
-
-    if ($(".has-error").length > 0) {
-      alert("Please fill all the fields");
+    if (test == "true") {
+      fetchTestCoverage();
     } else {
-      coverageRequest(params);
+      fetchRealCoverage();
     }
   });
 });
+
+fetchRealCoverage = function() {
+  var params = {
+    api_key: $("#api_key").val(),
+    payer_id: $("#payer_id").val(),
+    provider_npi: $("#provider_npi").val(),
+    provider_last_name: $("#provider_last_name").val(),
+    provider_first_name: $("#provider_first_name").val(),
+    member_id: $("#member_id").val(),
+    member_first_name: $("#member_first_name").val(),
+    member_last_name: $("#member_last_name").val(),
+    member_dob: $("#member_dob").val()
+  };
+
+  $.each(params, function(key) {
+    if ((params[key] === undefined) || (params[key].match(/^\s*$/))) {
+      $("#" + key).closest('.form-group').addClass('has-error');
+    } else {
+      $("#" + key).closest('.form-group').removeClass('has-error');
+    }
+  });
+
+  if ($(".has-error").length > 0) {
+    alert("Please fill all the fields");
+  } else {
+    coverageRequest(params);
+  }
+}
+
+fetchTestCoverage = function() {
+  var params = {
+    api_key: $("#api_key").val(),
+    test_member_id: $("#test_member_id").val()
+  };
+
+  $.each(params, function(key) {
+    if ((params[key] === undefined) || (params[key].match(/^\s*$/))) {
+      $("#" + key).closest('.form-group').addClass('has-error');
+    } else {
+      $("#" + key).closest('.form-group').removeClass('has-error');
+    }
+  });
+
+  if ($(".has-error").length > 0) {
+    alert("Please fill all the fields");
+  } else {
+    params['test'] = 'true';
+    params['member_id'] = params['test_member_id'];
+    delete params['test_member_id'];
+    params['provider_npi'] = params['provider_last_name'] = params['provider_first_name'] = params['member_id'] =
+      params['member_last_name'] = params['member_first_name'] = '1234567890';
+    params['payer_id'] = '00001';
+    params['member_dob'] = '1981-01-01';
+
+    coverageRequest(params);
+  }
+}
 
 buildError = function(error) {
   var coverageSection = $("<section/>").addClass("eligible-plugin-coverage-template");
