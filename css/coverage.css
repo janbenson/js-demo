@@ -1,7 +1,10 @@
 .form-coverage {
   padding-top: 50px;
 }
-
+.panel {
+  margin-bottom: 0px;
+  border-bottom: none;
+}
 .hidden {
   display: none;
 }

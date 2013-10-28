@@ -171,10 +171,15 @@ buildError = function(error) {
 buildCoverageHTML = function(data) {
   var coverageSection = $("<section/>").addClass("eligible-plugin-coverage-template");
 
-  // Adding Record Scrub and making it default selected element
-  var recordScrub = buildCoverageRecordScrub(data.demographics);
-  recordScrub.addClass("current");
-  recordScrub.appendTo(coverageSection);
+  // Build demographics
+  if (data['demographics']) {
+    if (data['demographics']['subscriber'] && data['demographics']['subscriber']['first_name']) {
+      coverageSection.append(buildPanelUI('Subscriber', buildDemographics(data.demographics.subscriber, "Subscriber")));
+    }
+    if (data['demographics']['dependent'] && data['demographics']['dependent']['first_name']) {
+      coverageSection.append(buildPanelUI('Dependent', buildDemographics(data.demographics.dependent, "Dependent")));
+    }
+  }
 
   // Adding benefits
   var benefits = buildCoveragePlanBenefits(data);
@@ -188,24 +193,87 @@ buildCoverageHTML = function(data) {
   coverageSection.appendTo(body);
 };
 
+buildPanelUI = function(title, content) {
+  var panel = $('<div class="panel panel-default">');
+  panel.append($('<div class="panel-heading">' + title + '</div>'));
+  var contentPanel = $('<div class="panel-body"></div>');
+  contentPanel.append(content);
+  panel.append(contentPanel);
+  return panel;
+}
+
+buildDemographics = function(person) {
+  var table = $("<table class=\"table table-hover\"/>");
+  table.append("<thead><th>Primary ID</th><th>Name / Address</th><th>Date of Birth</th><th>Gender</th><th>Additional Information</th></thead>");
+  var tableBody = $("<tbody/>").appendTo(table);
+
+  var row = $("<tr></tr>");
+  row.append("<td>" + person['member_id'] + "</td>");
+  row.append("<td>" + parseNameAndAddress(person).join("<br/>") + "</td>");
+  row.append("<td>" + person['dob'] + "</td>");
+  row.append("<td>" + parseGender(person['gender']) + "</td>");
+  row.append("<td>" + parsePersonAdditionalInfo(person).join("<br/>") + "</td>");
+  tableBody.append(row);
+
+  return(table);
+}
+
+parseNameAndAddress = function(person) {
+  var result = new Array();
+  result.push(person['last_name'] + ", " + person['first_name']);
+  if (person['address']) {
+    if (person['address']['street_line_1']) {
+      result.push(person['address']['street_line_1']);
+      if (person['address']['street_line_2'].length > 0 ) {
+        result.push(person['address']['street_line_2']);
+      }
+    }
+    if (person['address']['city']) {
+      if (person['address']['city'] == person['address']['state']) {
+        result.push(person['address']['state'] + ", " + person['address']['zip']);
+      } else {
+        result.push(person['address']['city'] + ", " + person['address']['state'] + ", " + person['address']['zip']);
+      }
+    }
+  }
+  return result;
+}
+
+parseGender = function(gender) {
+  if (gender == 'F') {
+    return "Female";
+  } else if (gender == 'M') {
+    return "Male";
+  } else {
+    return '';
+  }
+}
+
+parsePersonAdditionalInfo = function(person) {
+  var additionalInformation = new Array();
+  if (person['group_id']) {
+    additionalInformation.push("Group ID: " + person['group_id']);
+  }
+  if (person['group_name']) {
+    additionalInformation.push("Group Name: " + person['group_name']);
+  }
+  return additionalInformation;
+}
+
+
 buildCoverageServices = function(services) {
-  var services = $("<table class=\"table table-bordered\"/>").addClass("content details");
+  var services = $("<table class=\"table table-hover\"/>").addClass("content details");
 
   return services;
 };
 
-buildCoverageRecordScrub = function(demographics) {
-  var recordScrub = $("<table class=\"table table-bordered\"/>").addClass("content record-scrub");
-
-  return recordScrub;
-};
 
 buildCoveragePlanBenefits = function(data) {
   var plan = data.plan;
   var primaryInsurance = data.primary_insurance;
 
   var benefits = $("<div/>").addClass("content benefits");
-  var benefitsTable = $("<table class=\"table table-bordered\"/>").appendTo(benefits);
+  var benefitsTable = $("<table class=\"table table-hover\"/>").appendTo(benefits);
   var benefitsBody = $("<tbody/>").appendTo(benefitsTable);
 
   var payerRow = $("<tr/>");
@@ -302,7 +370,7 @@ buildCoveragePlanBenefits = function(data) {
 
 buildAdditionalInsuranceElement = function(additionalInsurances) {
   var additionalInsurancePolicies = $("<div/>");
-  var additionalInsuranceTable = $("<table class=\"table table-bordered\"/>").appendTo(additionalInsurancePolicies);
+  var additionalInsuranceTable = $("<table class=\"table table-hover\"/>").appendTo(additionalInsurancePolicies);
 
   var row1 = $("<tr/>").appendTo(additionalInsuranceTable);
   $("<th/>", {"text": "Insurance Type"}).appendTo(row1);
@@ -370,7 +438,7 @@ buildDisclaimerElement = function(data) {
 
 buildFinancialElement = function(data) {
   var financial = $("<div/>");
-  var financialTable = $("<table class=\"table table-bordered\"/>");
+  var financialTable = $("<table class=\"table table-hover\"/>");
 
   var row1 = $("<tr/>").appendTo(financialTable);
   $("<th/>", {"text": "Network"}).appendTo(row1);
@@ -395,7 +463,7 @@ buildFinancialElement = function(data) {
 
 buildAmountElement = function(amounts) {
   var amount = $("<div/>");
-  var amountTable = $("<table class=\"table table-bordered\"/>");
+  var amountTable = $("<table class=\"table table-hover\"/>");
 
   var row1 = $("<tr/>").appendTo(amountTable);
   $("<th/>", {"text": "Network"}).appendTo(row1);
@@ -417,7 +485,7 @@ buildAmountElement = function(amounts) {
 
 buildNetworkAmountElement = function(amounts) {
   var amount = $("<div/>");
-  var amountTable = $("<table class=\"table table-bordered\"/>");
+  var amountTable = $("<table class=\"table table-hover\"/>");
 
   var row1 = $("<tr/>").appendTo(amountTable);
   $("<th/>", {"text": "Network"}).appendTo(row1);
