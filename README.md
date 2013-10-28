@@ -9,4 +9,3 @@ instructions
 ============
 
 Just open the file index.html from any browser, fill the form and try it.
- 
