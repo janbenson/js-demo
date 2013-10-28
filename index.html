@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Eligible Coverage Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="css/cupertino/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" media="screen">
+  <link href="css/coverage.css" rel="stylesheet" media="screen">
+
+  <script src="js/lib/jquery-2.0.3.min.js"></script>
+  <script src="js/lib/jquery-ui-1.10.3.custom.min.js"></script>
+
+  <script src="js/coverage.js"></script>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="js/lib/html5shiv.js"></script>
+  <script src="js/lib/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+
+<div class="container">
+
+  <form role="form" class="form-horizontal form-coverage">
+    <div class="form-group">
+      <label for="api_key" class="col-lg-2 control-label">API Key</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="api_key">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="payer_id" class="col-lg-2 control-label">Payer ID</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="payer_id">
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>Service Provider</legend>
+
+      <div class="form-group">
+        <label for="provider_npi" class="col-lg-2 control-label">NPI</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="provider_npi">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="provider_last_name" class="col-lg-2 control-label">Last Name</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="provider_last_name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="provider_first_name" class="col-lg-2 control-label">First Name</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="provider_first_name">
+        </div>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Subscriber</legend>
+
+      <div class="form-group">
+        <label for="member_id" class="col-lg-2 control-label">ID</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="member_id">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="member_last_name" class="col-lg-2 control-label">Last Name</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="member_last_name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="member_first_name" class="col-lg-2 control-label">First Name</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="member_first_name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="member_dob" class="col-lg-2 control-label">DOB</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" id="member_dob">
+        </div>
+      </div>
+
+    </fieldset>
+
+    <div class="form-group">
+      <label for="member_dob" class="col-lg-2 control-label">Test?</label>
+      <div class="col-lg-10">
+        <input type="radio" name="test" id="test_yes" value="true" checked> Yes
+        <input type="radio" name="test" id="test_no" value="false"> No
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+</body>
+</html>

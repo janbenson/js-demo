@@ -1,0 +1,140 @@
+<section class="insurance-template hidden">
+  <header>
+    <h3>Jane Austin</h3>
+    <button class="close">Close</button>
+  </header>
+  <ul class="pages">
+    <li class="page-1 current">Record Scrub</li>
+    <li class="page-2">Benefits</li>
+    <li class="page-3">Details</li>
+  </ul>
+
+
+  <table class="content record-scrub current">
+    <tbody>
+    <tr>
+      <th scope="row">Primary payer</th>
+      <td class="value">Medicare</td>
+      <td class="not-match">Does Not Matches</td>
+    </tr>
+    <tr>
+      <th scope="row">DOB</th>
+      <td class="value">04/10/1781</td>
+      <td class="match">Matches</td>
+    </tr>
+    <tr>
+      <th scope="row">Member ID</th>
+      <td class="value">0039193</td>
+      <td class="match">Matches</td>
+    </tr>
+    <tr>
+      <th scope="row">Name</th>
+      <td class="value">Jane Austen</td>
+      <td class="match">Matches</td>
+    </tr>
+    <tr>
+      <th scope="row">Address</th>
+      <td class="value">Henrietta Street</td>
+      <td class="not-match">Does Not Match</td>
+    </tr>
+    </tbody>
+  </table>
+
+
+  <table class="content benefits">
+    <tbody>
+    <tr>
+      <th>Health Benefits</th>
+      <th>Active</th>
+      <th>Inactive</th>
+      <th>N/A</th>
+    </tr>
+    <tr>
+      <th scope="row">Different primary payer</th>
+      <td><span class="yes">yes</span></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">Medicatr Part A</th>
+      <td></td>
+      <td><span class="yes">yes</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">Medicare Part B</th>
+      <td><span class="yes">yes</span></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">Medicare Part D</th>
+      <td></td>
+      <td></td>
+      <td><span class="no">no</span></td>
+    </tr>
+    <tr>
+      <th scope="row">Medicare Advantage</th>
+      <td></td>
+      <td></td>
+      <td><span class="no">no</span></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="content details">
+
+    <select class="nav selectish">
+      <optgroup label="Common">
+        <option>Part A</option>
+        <option>Different Primary Payer</option>
+        <option>Home Health</option>
+        <option>Skilled Nursing</option>
+        <option>Part B</option>
+        <option>Physical Therapy</option>
+        <option>Intensive Cardiac Rehab</option>
+        <option selected="true">Hospice</option>
+        <option>Part D</option>
+      </optgroup>
+      <optgroup label="All possible">
+        <option>Cardiac Rehab</option>
+        <option>Blood Deductible</option>
+        <option>End Stage Renal Disease - Alternative method Dialysis</option>
+        <option>End Stage Renal Disease - Supplies in Home</option>
+      </optgroup>
+    </select>
+
+    <div class="detail">
+      <div class="header">
+        <h3>Hospice</h3>
+        <h4 class="match">Actively using Hospice-"Spell in progress" </h4>
+      </div>
+      <div class="benefit">
+        <h4>Date: 01/01/2010 - 03/02/2010</h4>
+
+        <h3>Deductible</h3>
+        <table>
+
+          <tbody>
+
+          <tr>
+            <dt>Coinsurance</dt>
+            <dd></dd>
+          </tr>
+          <tr>
+            <dt>Provider NPI number</dt>
+            <dd></dd>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- / details -->
+
+  <footer>
+    <button class="btn neutral cancel close">Cancel</button>
+    <button class="btn print-report">Print report</button>
+  </footer>
+</section>
+
