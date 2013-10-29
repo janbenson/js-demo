@@ -442,7 +442,43 @@ buildFinancialRows = function(data, network, level) {
         });
       }
       // Percents
+      if (item['percents'] && typeof(item['percents']) === 'object') {
+        // Remainings
+        if (item['percents'][network] && item['percents'][network].length > 0) {
+          $.each(item['percents'][network], function(idx, info) {
+            if (info['level'] == level) {
+              rows.push(buildFinancialRow(network, level, key, 'Remain', info));
+            }
+          });
+        }
+        // Totals
+        if (item['percents'][network] && item['percents'][network].length > 0) {
+          $.each(item['percents'][network], function(idx, info) {
+            if (info['level'] == level) {
+              rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
+            }
+          });
+        }
+      }
       // Amounts
+      if (item['amounts'] && typeof(item['amounts']) === 'object') {
+        // Remainings
+        if (item['amounts'][network] && item['amounts'][network].length > 0) {
+          $.each(item['amounts'][network], function(idx, info) {
+            if (info['level'] == level) {
+              rows.push(buildFinancialRow(network, level, key, 'Remain', info));
+            }
+          });
+        }
+        // Totals
+        if (item['amounts'][network] && item['amounts'][network].length > 0) {
+          $.each(item['amounts'][network], function(idx, info) {
+            if (info['level'] == level) {
+              rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
+            }
+          });
+        }
+      }      
     }
   });
 
@@ -457,7 +493,10 @@ buildFinancialRow = function(network, level, type, period, item) {
     $("<td/>", {text: 'Out'}).appendTo(row);
   $("<td/>", {text: level}).appendTo(row);
   $("<td/>", {text: type}).appendTo(row);
-  $("<td/>", {text: item['amount']}).appendTo(row);
+  if (item['amount'] && item['amount'].length > 0)
+    $("<td/>", {text: "$ " + item['amount'] + ".00"}).appendTo(row);
+  else if (item['percent'] && item['percent'].length > 0)
+    $("<td/>", {text: "% " +item['percent']}).appendTo(row);
   $("<td/>", {text: period}).appendTo(row);
 
   var extra_info = new Array();
