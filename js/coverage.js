@@ -196,6 +196,11 @@ buildCoverageHTML = function (data) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
   }
 
+  // Build plan coverage
+  if (data['plan'] && data['plan']['financials']) {
+    coverageSection.append(buildPanelUI('Health Benefit Plan Coverage', buildFinancials(data['plan']['financials'])));
+  }
+
   // Adding benefits
   var benefits = buildCoveragePlanBenefits(data);
   benefits.appendTo(coverageSection);
@@ -371,6 +376,97 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
   });
 
   return(table);
+}
+
+buildFinancials = function(data) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var rows = null;
+
+  $("<th/>", {text: "Network"}).appendTo(rowHead);
+  $("<th/>", {text: "Coverage"}).appendTo(rowHead);
+  $("<th/>", {text: "Type"}).appendTo(rowHead);
+  $("<th/>", {text: "Value"}).appendTo(rowHead);
+  $("<th/>", {text: "Period"}).appendTo(rowHead);
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+
+  // 1st In Network Individual
+  rows = buildFinancialRows(data, 'in_network', 'INDIVIDUAL');
+  $.each(rows, function(idx, row) {
+    tableBody.append(row);
+  })
+
+  // 2nd In Network Family
+  rows = buildFinancialRows(data, 'in_network', 'FAMILY');
+  $.each(rows, function(idx, row) {
+    tableBody.append(row);
+  })
+
+  // 3rd Out Network Individual
+  rows = buildFinancialRows(data, 'out_network', 'INDIVIDUAL');
+  $.each(rows, function(idx, row) {
+    tableBody.append(row);
+  })
+
+  // 4rd Out Network Family
+  rows = buildFinancialRows(data, 'out_network', 'FAMILY');
+  $.each(rows, function(idx, row) {
+    tableBody.append(row);
+  })
+
+  return(table);
+}
+
+buildFinancialRows = function(data, network, level) {
+  var rows = new Array();
+
+  $.each(data, function(key) {
+    item = data[key];
+    if (typeof(item) === 'object') {
+      // Remainings
+      if (item['remainings'] && item['remainings'][network] && item['remainings'][network].length > 0) {
+        $.each(item['remainings'][network], function(idx, info) {
+          if (info['level'] == level) {
+            rows.push(buildFinancialRow(network, level, key, 'Remain', info));
+          }
+        });
+      }
+      // Totals
+      if (item['totals'] && item['totals'][network] && item['totals'][network].length > 0) {
+        $.each(item['totals'][network], function(idx, info) {
+          if (info['level'] == level) {
+            rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
+          }
+        });
+      }
+      // Percents
+      // Amounts
+    }
+  });
+
+  return(rows);
+}
+
+buildFinancialRow = function(network, level, type, period, item) {
+  row = $("<tr/>");
+  if (network == 'in_network')
+    $("<td/>", {text: 'In'}).appendTo(row);
+  else
+    $("<td/>", {text: 'Out'}).appendTo(row);
+  $("<td/>", {text: level}).appendTo(row);
+  $("<td/>", {text: type}).appendTo(row);
+  $("<td/>", {text: item['amount']}).appendTo(row);
+  $("<td/>", {text: period}).appendTo(row);
+
+  var extra_info = new Array();
+  if (item['insurance_type_label'] && item['insurance_type_label'].length > 0) {
+    extra_info.push(item['insurance_type_label']);
+  }
+
+  $("<td/>", {html: extra_info.join("</br>")}).appendTo(row);
+  return(row);
 }
 
 
