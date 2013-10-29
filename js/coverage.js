@@ -191,13 +191,16 @@ buildCoverageHTML = function (data) {
     coverageSection.append(buildPanelUI('Plan', buildPlan(data['plan'])));
   }
 
+  // Build additional insurance policies
+  if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
+    coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
+  }
+
   // Adding benefits
   var benefits = buildCoveragePlanBenefits(data);
   benefits.appendTo(coverageSection);
 
   // Adding Service details
-  var services = buildCoverageServices(data.services);
-  services.appendTo(coverageSection);
 
   var body = $('body');
   coverageSection.appendTo(body);
@@ -205,7 +208,7 @@ buildCoverageHTML = function (data) {
 
 buildPanelUI = function (title, content) {
   var panel = $('<div class="panel panel-default">');
-  panel.append($('<div class="panel-heading">' + title + '</div>'));
+  panel.append($('<div class="panel-heading"><h4>' + title + '</h4></div>'));
   var contentPanel = $('<div class="panel-body"></div>');
   contentPanel.append(content);
   panel.append(contentPanel);
@@ -219,43 +222,34 @@ buildDemographics = function (person) {
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  rowHead.append("<th>Primary ID</th>");
-  row.append("<td>" + person['member_id'] + "</td>");
+  $("<th/>", {text: "Primary ID"}).appendTo(rowHead);
+  $("<td/>", {text: person['member_id']}).appendTo(row);
 
-  rowHead.append("<th>Name / Address</th>");
-  row.append("<td>" + parseNameAndAddress(person).join("<br/>") + "</td>");
+  $("<th/>", {text: "Name / Address"}).appendTo(rowHead);
+  $("<td/>", {html: parseNameAndAddress(person).join("<br/>")}).appendTo(row);
 
-  rowHead.append("<th>Date of Birth</th>");
-  row.append("<td>" + person['dob'] + "</td>");
+  $("<th/>", {text: "Date of Birth"}).appendTo(rowHead);
+  $("<td/>", {text: person['dob']}).appendTo(row);
 
-  rowHead.append("<th>Gender</th>");
-  row.append("<td>" + parseGender(person['gender']) + "</td>");
+  $("<th/>", {text: "Gender"}).appendTo(rowHead);
+  $("<td/>", {text: parseGender(person['gender'])}).appendTo(row);
 
-  rowHead.append("<th>Additional Information</th>");
-  row.append("<td>" + parsePersonAdditionalInfo(person).join("<br/>") + "</td>");
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+  $("<td/>", {html: parsePersonAdditionalInfo(person).join("<br/>")}).appendTo(row);
 
   return(table);
 }
 
 parseNameAndAddress = function (person) {
   var result = new Array();
-  result.push(person['last_name'] + ", " + person['first_name']);
+
+  result.push(parseName(person));
+
   if (person['address']) {
-    if (person['address']['street_line_1']) {
-      result.push(person['address']['street_line_1']);
-      if (person['address']['street_line_2'].length > 0) {
-        result.push(person['address']['street_line_2']);
-      }
-    }
-    if (person['address']['city']) {
-      if (person['address']['city'] == person['address']['state']) {
-        result.push(person['address']['state'] + ", " + person['address']['zip']);
-      } else {
-        result.push(person['address']['city'] + ", " + person['address']['state'] + ", " + person['address']['zip']);
-      }
-    }
+    result = result.concat(parseAddress(person['address']));
   }
-  return result;
+
+  return(result);
 }
 
 parseGender = function (gender) {
@@ -286,14 +280,14 @@ buildPrimaryInsurance = function (primaryInsurance) {
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  rowHead.append("<th>Name</th>");
-  row.append("<td>" + primaryInsurance['name'] + "</td>");
+  $("<th/>", {text: "Name"}).appendTo(rowHead);
+  $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
 
-  rowHead.append("<th>ID</th>");
-  row.append("<td>" + primaryInsurance['id'] + "</td>");
+  $("<th/>", {text: "ID"}).appendTo(rowHead);
+  $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
 
-  rowHead.append("<th>Contacts</th>");
-  row.append("<td>" + parseContacts(primaryInsurance['contacts']).join("<br/>") + "</td>");
+  $("<th/>", {text: "Contacts"}).appendTo(rowHead);
+  $("<td/>", {html: parseContacts(primaryInsurance['contacts']).join("<br/>")}).appendTo(row);
 
   return(table);
 }
@@ -309,23 +303,23 @@ buildPlan = function (plan) {
   row.append("<td>" + coverageStatus(plan) + "</td>")
 
   if (plan['plan_name'] && plan['plan_name'].length > 0) {
-    rowHead.append("<th>Plan Name</th>");
-    row.append("<td>" + plan['plan_name'] + "</td>");
+    $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_name']}).appendTo(row);
   }
 
   if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
-    rowHead.append("<th>Plan Type</th>");
-    row.append("<td>" + plan['plan_type_label'] + "</td>");
+    $("<th/>", {text: "Plan Type"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
   }
 
   if (plan['group_name'] && plan['group_name'].length > 0) {
-    rowHead.append("<th>Group Name</th>");
-    row.append("<td>" + plan['group_name'] + "</td>");
+    $("<th/>", {text: "Group Name"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
   }
 
   if (plan['plan_number'] && plan['plan_number'].length > 0) {
-    rowHead.append("<th>Plan Number</th>");
-    row.append("<td>" + plan['plan_number'] + "</td>");
+    $("<th/>", {text: "Plan Number"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_number']}).appendTo(row);
   }
 
   if (plan['dates']) {
@@ -334,30 +328,50 @@ buildPlan = function (plan) {
     var serviceDates = getTypeSpecificDates(plan['dates'], "service");
 
     if (eligibleDates && eligibleDates.length > 0) {
-      rowHead.append("<th>Eligible</th>");
-      row.append("<td>" + eligibleDates + "</td>");
+      $("<th/>", {text: "Eligible"}).appendTo(rowHead);
+      $("<td/>", {text: eligibleDates}).appendTo(row);
     }
 
     if (planDates && planDates.length > 0) {
-      rowHead.append("<th>Plan</th>");
-      row.append("<td>" + planDates + "</td>");
+      $("<th/>", {text: "Plan"}).appendTo(rowHead);
+      $("<td/>", {text: planDates}).appendTo(row);
     }
 
     if (serviceDates && serviceDates.length > 0) {
-      rowHead.append("<th>Service</th>");
-      row.append("<td>" + serviceDates + "</td>");
+      $("<th/>", {text: "Service"}).appendTo(rowHead);
+      $("<td/>", {text: serviceDates}).appendTo(row);
     }
   }
 
   return(table);
 }
 
+buildAdditionalInsurancePolicies = function (additionalPolicies) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
 
-buildCoverageServices = function (services) {
-  var services = $("<table class=\"table table-hover\"/>").addClass("content details");
+  $("<th/>", {text: "Insurance Type"}).appendTo(rowHead);
+  $("<th/>", {text: "Coverage Description"}).appendTo(rowHead);
+  $("<th/>", {text: "References"}).appendTo(rowHead);
+  $("<th/>", {text: "Contact Details"}).appendTo(rowHead);
+  $("<th/>", {text: "Dates"}).appendTo(rowHead);
+  $("<th/>", {text: "Comments"}).appendTo(rowHead);
 
-  return services;
-};
+  $.each(additionalPolicies, function (index, policy) {
+    var row = $("<tr/>").appendTo(tableBody);
+
+    $("<td/>", {text: policy['insurance_type_label']}).appendTo(row);
+    $("<td/>", {text: policy['coverage_description']}).appendTo(row);
+    $("<td/>", {html: parseReference(policy['reference']).join("<br/>")}).appendTo(row);
+    $("<td/>", {html: parseContactDetails(policy['contact_details']).join("<br/>")}).appendTo(row);
+    $("<td/>", {html: parseDates(policy['dates']).join("<br/>")}).appendTo(row);
+    $("<td/>", {html: parseComments(policy['comments']).join("<br/>")}).appendTo(row);
+  });
+
+  return(table);
+}
 
 
 buildCoveragePlanBenefits = function (data) {
@@ -369,10 +383,6 @@ buildCoveragePlanBenefits = function (data) {
   var benefitsBody = $("<tbody/>").appendTo(benefitsTable);
 
   var details = $("<div/>", {"id": "benefits_accordion"});
-
-  $("<h3/>", {"text": "Additional Insurance Policies"}).appendTo(details);
-  var additionalInsurance = buildAdditionalInsuranceElement(plan.additional_insurance_policies);
-  additionalInsurance.appendTo(details);
 
   $("<h3/>", {"text": "Exclusion"}).appendTo(details);
   var exclusion = buildExclusionElement(plan.exclusions);
@@ -439,39 +449,6 @@ buildCoveragePlanBenefits = function (data) {
   return benefits;
 };
 
-buildAdditionalInsuranceElement = function (additionalInsurances) {
-  var additionalInsurancePolicies = $("<div/>");
-  var additionalInsuranceTable = $("<table class=\"table table-hover\"/>").appendTo(additionalInsurancePolicies);
-
-  var row1 = $("<tr/>").appendTo(additionalInsuranceTable);
-  $("<th/>", {"text": "Insurance Type"}).appendTo(row1);
-  $("<th/>", {"text": "Payer Type"}).appendTo(row1);
-  $("<th/>", {"text": "Identification Type"}).appendTo(row1);
-  $("<th/>", {"text": "Identification Value"}).appendTo(row1);
-  $("<th/>", {"text": "Coverage Description"}).appendTo(row1);
-  $("<th/>", {"text": "References"}).appendTo(row1);
-  $("<th/>", {"text": "Contact Details"}).appendTo(row1);
-  $("<th/>", {"text": "Dates"}).appendTo(row1);
-  $("<th/>", {"text": "Comments"}).appendTo(row1);
-
-  $.each(additionalInsurances, function (index, current) {
-    var parsedObj = parseAdditionalInsurance(current);
-    var contactDetailsObj = current.contact_details[0];
-    var row = $("<tr/>").appendTo(additionalInsuranceTable);
-    $("<td/>", {"text": parsedObj.insuranceType}).appendTo(row);
-    $("<td/>", {"text": contactDetailsObj == undefined ? "" : contactDetailsObj.type_label}).appendTo(row);
-    $("<td/>", {"text": contactDetailsObj == undefined ? "" : contactDetailsObj.identification_type}).appendTo(row);
-    $("<td/>", {"text": contactDetailsObj == undefined ? "" : contactDetailsObj.identification_code}).appendTo(row);
-    $("<td/>", {"text": parsedObj.coverage_description}).appendTo(row);
-    $("<td/>", {"text": parsedObj.reference}).appendTo(row);
-    $("<td/>", {"text": parsedObj.contactDetails}).appendTo(row);
-    $("<td/>", {"text": parsedObj.dates}).appendTo(row);
-    $("<td/>", {"text": parsedObj.comments}).appendTo(row);
-  });
-
-  return additionalInsurancePolicies;
-};
-
 buildExclusionElement = function (exclusions) {
   var exclusion = $("<div/>");
   var nonCoveredElement = buildNonCoveredElement(exclusions.noncovered);
@@ -503,7 +480,7 @@ buildNonCoveredElement = function (noncovered) {
 };
 
 buildDisclaimerElement = function (data) {
-  var disclaimer = $("<div/>", {"text": parseComments(data)});
+  var disclaimer = $("<div/>", {"text": parseComments(data).join("<br/>")});
   return disclaimer;
 };
 
@@ -590,7 +567,7 @@ addFinancialElementRowsToTable = function (data, network, period, table) {
     $("<td/>", {"text": current.pos_label}).appendTo(row);
     $("<td/>", {"text": current.authorization_required}).appendTo(row);
     $("<td/>", {"text": getTypeSpecificDates(current.dates, "eligibilty")}).appendTo(row);
-    $("<td/>", {"text": parseComments(current.comments)}).appendTo(row);
+    $("<td/>", {"text": parseComments(current.comments).join("<br/>")}).appendTo(row);
   });
 };
 
@@ -605,7 +582,7 @@ addAmountsElementRowsToTable = function (amounts, network, table) {
     $("<td/>", {"text": current.pos_label}).appendTo(row);
     $("<td/>", {"text": current.authorization_required}).appendTo(row);
     $("<td/>", {"text": getTypeSpecificDates(current.dates, "eligibilty")}).appendTo(row);
-    $("<td/>", {"text": parseComments(current.comments)}).appendTo(row);
+    $("<td/>", {"text": parseComments(current.comments).join("<br/>")}).appendTo(row);
   });
 };
 
@@ -656,28 +633,14 @@ getTypeSpecificDates = function (dates, type) {
   return formatDates(start, end);
 };
 
-parseAdditionalInsurance = function (additionalInsurance) {
-  var additionalInsuranceObj = {};
-
-  additionalInsuranceObj.insuranceType = additionalInsurance.insurance_type_label;
-  additionalInsuranceObj.coverage_description = additionalInsurance.coverage_description;
-  additionalInsuranceObj.reference = parseReference(additionalInsurance.reference);
-  additionalInsuranceObj.contactDetails = parseContactDetails(additionalInsurance.contact_details);
-  additionalInsuranceObj.dates = parseDates(additionalInsurance.dates);
-  additionalInsuranceObj.comments = parseComments(additionalInsurance.comments);
-  return additionalInsuranceObj;
-};
-
 parseReference = function (reference) {
-  var referenceString = "";
+  var result = new Array();
+
   $.each(reference, function (index, current) {
-    if (referenceString != "") {
-      referenceString += ", " + current.reference_label + ": " + current.reference_number;
-    } else {
-      referenceString += current.reference_label + ": " + current.reference_number;
-    }
+    result.push(current.reference_label + ": " + current.reference_number);
   });
-  return referenceString;
+
+  return result;
 };
 
 parseCoverageBasis = function (coverage_basis) {
@@ -698,8 +661,8 @@ parseNonCovered = function (nonCovered) {
     nonCoveredElement.pos = nonCovered.pos_label;
     nonCoveredElement.auth = nonCovered.authorization_required;
     nonCoveredElement.contactDetails = parseContactDetails(nonCovered.contact_details);
-    nonCoveredElement.dates = parseDates(nonCovered.dates);
-    nonCoveredElement.comments = parseComments(nonCovered.comments);
+    nonCoveredElement.dates = parseDates(nonCovered.dates).join("<br/>");
+    nonCoveredElement.comments = parseComments(nonCovered.comments).join("<br/>");
   }
   return nonCoveredElement;
 };
@@ -711,8 +674,8 @@ parseProvider = function (provider) {
   providerObject.insuranceType = provider.insurance_type_label;
   providerObject.primaryCare = provider.primary_care;
   providerObject.restricted = provider.restricted;
-  providerObject.dates = parseDates(provider.dates);
-  providerObject.comments = parseComments(provider.comments);
+  providerObject.dates = parseDates(provider.dates).join("<br/>");
+  providerObject.comments = parseComments(provider.comments).join("<br/>");
   return providerObject;
 };
 
@@ -731,76 +694,74 @@ isEmptyDetails = function (details) {
 };
 
 parseDates = function (dates) {
-  var datesString = "";
+  var list = new Array();
+
   $.each(dates, function (index, current) {
-    if (datesString != "") {
-      datesString += ", " + current.date_type + ": " + current.date_value;
-    } else {
-      datesString = current.date_type + ": " + current.date_value;
-    }
+    list.push(current.date_type + ": " + current.date_value);
   });
 
-  if (datesString != "") {
-    datesString = "Dates: " + datesString;
-  }
-
-  return datesString;
+  return(list);
 };
 
 parseComments = function (comments) {
-  var commentString = "";
+  var list = new Array();
+
   $.each(comments, function (index, comment) {
-    commentString = commentString + "\n" + comment;
+    list.push(comment);
   });
 
-  if (commentString != "") {
-    commentString = "Free Text: " + commentString;
-  }
-  return commentString;
+  return(list);
 };
 
 parseContactDetails = function (contactDetails) {
-  var details = "Contact Details: ";
-  $.each(contactDetails, function (index, current) {
-    details += parseName(current);
-    details += parseAddress(current.address) == "" ? "" : ", " + parseAddress(current.address);
-    details += parseContacts(current.contacts).join(", ") == "" ? "" : ", " + parseContacts(current.contacts).join(", ")
+  var list = new Array();
+  $.each(contactDetails, function (index, details) {
+    var detailsList = new Array();
+    detailsList.push(parseName(details));
+    if (details['address'] && details['address']['street_line_1']) {
+      detailsList.push(parseAddress(details['address']));
+    }
+    if (details['contacts'] && details['contacts'].length > 0) {
+      detailsList.push(parseContacts(details['contacts']));
+    }
+    list.push(detailsList);
   });
-  return details;
+  return(list);
 };
 
 parseName = function (data) {
-  var name = "";
+  firstName = data['first_name'];
+  lastName = data['last_name'];
 
-  name = data.first_name;
-  if (isPresent(name) && isPresent(data.last_name)) {
-    name += " " + data.last_name;
-  } else if (isPresent(data.last_name)) {
-    name = data.last_name;
+  if (isPresent(firstName) && isPresent(lastName)) {
+    return(firstName + " " + lastName);
+  } else if (isPresent(firstName)) {
+    return(firstName);
+  } else if (isPresent(lastName)) {
+    return(lastName);
+  } else {
+    return "";
   }
-
-  if (name != "") {
-    name = "Name: " + name;
-  }
-  return name;
 };
 
 parseAddress = function (addressData) {
-  var address = "";
-  for (key in addressData) {
-    if (isPresent(addressData[key])) {
-      if (address != "") {
-        address = address + ", " + addressData[key];
-      } else {
-        address = addressData[key];
-      }
+  var list = new Array();
+  if (addressData['street_line_1'] && addressData['street_line_1'].length > 0) {
+    list.push(addressData['street_line_1']);
+    if (addressData['street_line_2'] && addressData['street_line_2'].length > 0) {
+      list.push(addressData['street_line_2']);
     }
   }
 
-  if (address != "") {
-    address = "Address: " + address;
+  if (addressData['city']) {
+    if (addressData['city'] == addressData['state']) {
+      list.push(addressData['state'] + ", " + addressData['zip']);
+    } else {
+      list.push(addressData['city'] + ", " + addressData['state'] + ", " + addressData['zip']);
+    }
   }
-  return address;
+
+  return(list);
 };
 
 parseContacts = function (contactData) {
