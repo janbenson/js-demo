@@ -1,11 +1,23 @@
 .form-coverage {
   padding-top: 50px;
 }
+
 .panel {
   margin-bottom: 0px;
   border-bottom: none;
+  display: inline-block;
 }
+
 .hidden {
   display: none;
 }
 
+.subscriber-section {
+	width: 45%;
+}
+
+.primary-insurance,
+.additional-insurance-policies {
+	width: 50%;
+	float: right;
+}

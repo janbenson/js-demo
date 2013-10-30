@@ -213,7 +213,14 @@ buildCoverageHTML = function (data) {
   }
 
   var body = $('body');
+  var subscriberSection = $(document.createElement('section')).addClass('subscriber-section');
+
   coverageSection.appendTo(body);
+  subscriberSection.prependTo(coverageSection);
+
+  // Adding classes for styling --
+  $('.primary-id').closest('.panel')
+
 };
 
 buildPanelUI = function (title, content) {
@@ -222,6 +229,9 @@ buildPanelUI = function (title, content) {
   var contentPanel = $('<div class="panel-body"></div>');
   contentPanel.append(content);
   panel.append(contentPanel);
+
+  // --
+  panel.addClass(title.replace(/ /g,'-').toLowerCase());
   return panel;
 }
 
@@ -232,7 +242,7 @@ buildDemographics = function (person) {
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  $("<th/>", {text: "Primary ID"}).appendTo(rowHead);
+  $("<th/>", {text: "Primary ID"}).appendTo(rowHead).addClass('primary-id');
   $("<td/>", {text: person['member_id']}).appendTo(row);
 
   $("<th/>", {text: "Name / Address"}).appendTo(rowHead);
@@ -503,7 +513,7 @@ buildFinancialRows = function(data, network, level) {
             }
           });
         }
-      }      
+      }
     }
   });
 
