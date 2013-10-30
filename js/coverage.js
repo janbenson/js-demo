@@ -202,6 +202,15 @@ buildCoverageHTML = function (data) {
   }
 
   // Adding Service details
+  if (data['services'] && data['services'].length > 0) {
+    $.each(data['services'], function(idx, service) {
+      console.log(service);
+      console.log(coverageStatus(service));
+      if (coverageStatus(service) == "Active") {
+        coverageSection.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
+      }
+    });
+  }
 
   var body = $('body');
   coverageSection.appendTo(body);
