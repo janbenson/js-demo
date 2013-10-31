@@ -183,7 +183,7 @@ buildCoverageHTML = function (data) {
 
   // Build primary insurance
   if (data['primary_insurance'] && data['primary_insurance']['name']) {
-    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'])));
+    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'],data['plan'])));
   }
 
   // Build plan detail
@@ -214,13 +214,19 @@ buildCoverageHTML = function (data) {
 
   var body = $('body');
   var subscriberSection = $(document.createElement('section')).addClass('subscriber-section');
+  var insuranceSection = $(document.createElement('section')).addClass('insurance-section');
+  var coverageStatusSection = $(document.createElement('section')).addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
+
 
   coverageSection.appendTo(body);
   subscriberSection.prependTo(coverageSection);
+  insuranceSection.insertAfter(subscriberSection);
+  coverageStatusSection.insertAfter(insuranceSection);
 
   // Adding classes for styling --
-  $('.primary-id').closest('.panel')
-
+  $('.primary-id').closest('.panel').appendTo(subscriberSection);
+  $('[class*="insurance"]').appendTo(insuranceSection);
+  coverageStatusSection.find('.coverage-status').text($('.coverage-status-text').text());
 };
 
 buildPanelUI = function (title, content) {
@@ -242,11 +248,11 @@ buildDemographics = function (person) {
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  $("<th/>", {text: "Primary ID"}).appendTo(rowHead).addClass('primary-id');
-  $("<td/>", {text: person['member_id']}).appendTo(row);
-
   $("<th/>", {text: "Name / Address"}).appendTo(rowHead);
   $("<td/>", {html: parseNameAndAddress(person).join("<br/>")}).appendTo(row);
+
+  $("<th/>", {text: "Primary ID"}).appendTo(rowHead).addClass('primary-id');
+  $("<td/>", {text: person['member_id']}).appendTo(row);
 
   $("<th/>", {text: "Date of Birth"}).appendTo(rowHead);
   $("<td/>", {text: person['dob']}).appendTo(row);
@@ -293,7 +299,7 @@ parsePersonAdditionalInfo = function (person) {
   return additionalInformation;
 }
 
-buildPrimaryInsurance = function (primaryInsurance) {
+buildPrimaryInsurance = function (primaryInsurance, plan) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -302,6 +308,37 @@ buildPrimaryInsurance = function (primaryInsurance) {
 
   $("<th/>", {text: "Name"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
+
+  if (plan['plan_name'] && plan['plan_name'].length > 0) {
+    $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_name']}).appendTo(row);
+  }
+
+  if (plan['dates']) {
+    var eligibleDates = getTypeSpecificDates(plan['dates'], "eligibilty");
+    var planDates = getTypeSpecificDates(plan['dates'], "plan");
+    var serviceDates = getTypeSpecificDates(plan['dates'], "service");
+
+    if (eligibleDates && eligibleDates.length > 0) {
+      $("<th/>", {text: "Eligible"}).appendTo(rowHead);
+      $("<td/>", {text: eligibleDates}).appendTo(row);
+    }
+
+    if (planDates && planDates.length > 0) {
+      $("<th/>", {text: "Plan"}).appendTo(rowHead);
+      $("<td/>", {text: planDates}).appendTo(row);
+    }
+
+    if (serviceDates && serviceDates.length > 0) {
+      $("<th/>", {text: "Service"}).appendTo(rowHead);
+      $("<td/>", {text: serviceDates}).appendTo(row);
+    }
+  }
+
+  if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
+    $("<th/>", {text: "Plan Type"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
+  }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
@@ -320,7 +357,7 @@ buildPlan = function (plan) {
   var row = $("<tr></tr>").appendTo(tableBody);
 
   rowHead.append("<th>Coverage Status</th>");
-  row.append("<td>" + coverageStatus(plan) + "</td>")
+  row.append("<td class='coverage-status-text'>" + coverageStatus(plan) + "</td>");
 
   if (plan['plan_name'] && plan['plan_name'].length > 0) {
     $("<th/>", {text: "Plan Name"}).appendTo(rowHead);

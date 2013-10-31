@@ -6,6 +6,7 @@
   margin-bottom: 0px;
   border-bottom: none;
   display: inline-block;
+
 }
 
 .hidden {
@@ -14,10 +15,33 @@
 
 .subscriber-section {
 	width: 45%;
+	float: left;
+	margin-bottom: 50px;
 }
 
-.primary-insurance,
-.additional-insurance-policies {
+.subscriber-section .panel {
+	width: 100%;
+}
+
+.insurance-section {
 	width: 50%;
 	float: right;
+	margin-bottom: 50px;
+}
+
+.insurance-section .panel {
+	width: 100%;
+}
+
+.coverage-status-section {
+	width: 40%;
+	clear: left;
+	float: left;
+	font-size: 30px;
+}
+
+.coverage-status-section h1 {
+	width: 53%;
+	padding-bottom: 20px;
+	border-bottom: 5px solid #eee;
 }
