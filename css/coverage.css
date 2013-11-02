@@ -23,13 +23,12 @@
 	width: 100%;
 }
 
-.insurance-section {
+.insurance-section, .plan-section {
 	width: 50%;
 	float: right;
-	margin-bottom: 50px;
 }
 
-.insurance-section .panel {
+.insurance-section .panel, .plan-section .panel {
 	width: 100%;
 }
 
@@ -44,4 +43,21 @@
 	width: 53%;
 	padding-bottom: 20px;
 	border-bottom: 5px solid #eee;
+}
+
+.healthbenefitplancoverage {
+  width: 100%;
+  clear: both;
+}
+
+.services-div > div {
+  width: 50%;
+}
+
+.services-div > div:first-child {
+  float: left;
+}
+
+.services-div > div:last-child {
+  float: right;
 }
