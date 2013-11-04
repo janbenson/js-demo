@@ -170,11 +170,12 @@ buildError = function (error) {
 
 buildCoverageHTML = function (data) {
   var coverageSection = $("<section/>").addClass("eligible-plugin-coverage-template");
+  // var additionalInsuranceSection;
 
   // Build demographics
   if (data['demographics']) {
     if (data['demographics']['subscriber'] && data['demographics']['subscriber']['first_name']) {
-      coverageSection.append(buildPanelUI('Subscriber', buildDemographics(data['demographics']['subscriber'], "Subscriber")));
+      coverageSection.append(buildPanelUI('Patient', buildDemographics(data['demographics']['subscriber'], "Subscriber"))); //was 'Subscriber'
     }
     if (data['demographics']['dependent'] && data['demographics']['dependent']['first_name']) {
       coverageSection.append(buildPanelUI('Dependent', buildDemographics(data['demographics']['dependent'], "Dependent")));
@@ -183,17 +184,22 @@ buildCoverageHTML = function (data) {
 
   // Build primary insurance
   if (data['primary_insurance'] && data['primary_insurance']['name']) {
-    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'],data['plan'])));
+    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'])));
   }
 
   // Build plan detail
   if (data['plan'] && data['plan']['coverage_status']) {
     coverageSection.append(buildPanelUI('Plan', buildPlan(data['plan'])));
+    // --
+    coverageSection.append(buildPanelUI('Plan', buildPlan(data['demographics']['subscriber'])));
+    coverageSection.append(buildPanelUI('Plan', buildPlan(data['primary_insurance'])));
   }
 
   // Build additional insurance policies
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
+
+    // additionalInsuranceSection = $(document.createElement('section')).addClass('additional-insurance-section').append('<p>Other insurance policies were found. Click below to see details</p>');
   }
 
   // Build plan coverage
@@ -222,10 +228,13 @@ buildCoverageHTML = function (data) {
   subscriberSection.prependTo(coverageSection);
   insuranceSection.insertAfter(subscriberSection);
   coverageStatusSection.insertAfter(insuranceSection);
+  // additionalInsuranceSection.insertAfter(subscriberSection);
 
   // Adding classes for styling --
-  $('.primary-id').closest('.panel').appendTo(subscriberSection);
-  $('[class*="insurance"]').appendTo(insuranceSection);
+  $('.patient').appendTo(subscriberSection);
+  $('.dependent').appendTo(subscriberSection);
+  $('.primary-insurance').appendTo(insuranceSection); //$('[class*="insurance"]').appendTo(insuranceSection);
+  $('.plan').appendTo(insuranceSection);
   coverageStatusSection.find('.coverage-status').text($('.coverage-status-text').text());
 };
 
@@ -251,8 +260,8 @@ buildDemographics = function (person) {
   $("<th/>", {text: "Name / Address"}).appendTo(rowHead);
   $("<td/>", {html: parseNameAndAddress(person).join("<br/>")}).appendTo(row);
 
-  $("<th/>", {text: "Primary ID"}).appendTo(rowHead).addClass('primary-id');
-  $("<td/>", {text: person['member_id']}).appendTo(row);
+  // $("<th/>", {text: "Primary ID"}).appendTo(rowHead).addClass('primary-id');
+  // $("<td/>", {text: person['member_id']}).appendTo(row);
 
   $("<th/>", {text: "Date of Birth"}).appendTo(rowHead);
   $("<td/>", {text: person['dob']}).appendTo(row);
@@ -260,8 +269,10 @@ buildDemographics = function (person) {
   $("<th/>", {text: "Gender"}).appendTo(rowHead);
   $("<td/>", {text: parseGender(person['gender'])}).appendTo(row);
 
-  $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
-  $("<td/>", {html: parsePersonAdditionalInfo(person).join("<br/>")}).appendTo(row);
+  // $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+  // $("<td/>", {html: parsePersonAdditionalInfo(person).join("<br/>")}).appendTo(row);
+
+
 
   return(table);
 }
@@ -299,7 +310,7 @@ parsePersonAdditionalInfo = function (person) {
   return additionalInformation;
 }
 
-buildPrimaryInsurance = function (primaryInsurance, plan) {
+buildPrimaryInsurance = function (primaryInsurance) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -309,36 +320,15 @@ buildPrimaryInsurance = function (primaryInsurance, plan) {
   $("<th/>", {text: "Name"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
 
-  if (plan['plan_name'] && plan['plan_name'].length > 0) {
-    $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_name']}).appendTo(row);
-  }
 
-  if (plan['dates']) {
-    var eligibleDates = getTypeSpecificDates(plan['dates'], "eligibilty");
-    var planDates = getTypeSpecificDates(plan['dates'], "plan");
-    var serviceDates = getTypeSpecificDates(plan['dates'], "service");
 
-    if (eligibleDates && eligibleDates.length > 0) {
-      $("<th/>", {text: "Eligible"}).appendTo(rowHead);
-      $("<td/>", {text: eligibleDates}).appendTo(row);
-    }
+  $("<th/>", {text: "Insurance Type"}).appendTo(rowHead);
+  $("<td/>", {text: "fill in"}).appendTo(row);
 
-    if (planDates && planDates.length > 0) {
-      $("<th/>", {text: "Plan"}).appendTo(rowHead);
-      $("<td/>", {text: planDates}).appendTo(row);
-    }
+  $("<th/>", {text: "Member Type"}).appendTo(rowHead);
+  $("<td/>", {text: "fill in"}).appendTo(row);
 
-    if (serviceDates && serviceDates.length > 0) {
-      $("<th/>", {text: "Service"}).appendTo(rowHead);
-      $("<td/>", {text: serviceDates}).appendTo(row);
-    }
-  }
 
-  if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
-    $("<th/>", {text: "Plan Type"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
-  }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
@@ -356,28 +346,84 @@ buildPlan = function (plan) {
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  rowHead.append("<th>Coverage Status</th>");
+  // var row2 = $("<tr></tr>").appendTo(tableBody);
+  // var cell2 = $("<td/>").appendTo(row2);
+  // var table2 = $("<table class=\"table table-hover\"/>").appendTo(cell2);
+
+  // var tableHeadInside = $("<thead></thead>").appendTo(table2);
+  // var rowHeadInside = $("<tr></tr>").appendTo(tableHeadInside);
+  // var tableBodyInside = $("<tbody/>").appendTo(table2);
+  // var rowInside = $("<tr></tr>").appendTo(tableBodyInside);
+
+
+  //temporary solution
+  if(plan['member_id']) {
+
+    $("<th/>", {text: "Group ID"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_id']}).appendTo(row);
+
+    $("<th/>", {text: "Group Name"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    $("<th/>", {text: "Dates"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    $("<th/>", {text: "Subscriber Info"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    return(table);
+  }
+
+  if(plan['contacts']) {
+
+    $("<th/>", {text: "Group Providers"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_id']}).appendTo(row);
+
+    $("<th/>", {text: "Type"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    $("<th/>", {text: "Name"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    $("<th/>", {text: "Contacts"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+    $("<td/>", {text: plan['group_name']}).appendTo(row);
+
+    return(table);
+  }
+
+  rowHead.append("<th>Coverage</th>");
   row.append("<td class='coverage-status-text'>" + coverageStatus(plan) + "</td>");
+
+
+  if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
+    $("<th/>", {text: "Type"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
+  }
 
   if (plan['plan_name'] && plan['plan_name'].length > 0) {
     $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
     $("<td/>", {text: plan['plan_name']}).appendTo(row);
   }
 
-  if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
-    $("<th/>", {text: "Plan Type"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
+  if (plan['plan_number'] && plan['plan_number'].length > 0) {
+    $("<th/>", {text: "Plan Number"}).appendTo(rowHead);
+    $("<td/>", {text: plan['plan_number']}).appendTo(row);
   }
+
+  rowHead.append("<th>Additional Information</th>");
+  row.append("<td>fill in</td>");
+
+
 
   if (plan['group_name'] && plan['group_name'].length > 0) {
     $("<th/>", {text: "Group Name"}).appendTo(rowHead);
     $("<td/>", {text: plan['group_name']}).appendTo(row);
   }
 
-  if (plan['plan_number'] && plan['plan_number'].length > 0) {
-    $("<th/>", {text: "Plan Number"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_number']}).appendTo(row);
-  }
+
 
   if (plan['dates']) {
     var eligibleDates = getTypeSpecificDates(plan['dates'], "eligibilty");
@@ -401,7 +447,7 @@ buildPlan = function (plan) {
   }
 
   return(table);
-}
+};
 
 buildAdditionalInsurancePolicies = function (additionalPolicies) {
   var table = $("<table class=\"table table-hover\"/>");
@@ -428,7 +474,7 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
   });
 
   return(table);
-}
+};
 
 buildFinancials = function(data) {
   var table = $("<table class=\"table table-hover\"/>");
@@ -489,7 +535,7 @@ buildFinancials = function(data) {
   }
 
   return(table);
-}
+};
 
 buildFinancialRows = function(data, network, level) {
   var rows = new Array();
@@ -555,17 +601,19 @@ buildFinancialRows = function(data, network, level) {
   });
 
   return(rows);
-}
+};
 
 buildFinancialRow = function(network, level, type, period, item) {
   row = $("<tr/>");
   $("<td/>").appendTo(row);
   $("<td/>").appendTo(row);
-//  if (network == 'in_network')
-//    $("<td/>", {text: 'In'}).appendTo(row);
-//  else
-//    $("<td/>", {text: 'Out'}).appendTo(row);
-//  $("<td/>", {text: level}).appendTo(row);
+
+ // if (network == 'in_network')
+ //   $("<td/>", {text: 'In'}).appendTo(row);
+ // else
+ //   $("<td/>", {text: 'Out'}).appendTo(row);
+ // $("<td/>", {text: level}).appendTo(row);
+
   $("<td/>", {text: type}).appendTo(row);
   if (item['amount'] && item['amount'].length > 0)
     $("<td/>", {text: "$ " + item['amount'] + ".00"}).appendTo(row);
@@ -585,7 +633,7 @@ buildFinancialRow = function(network, level, type, period, item) {
 
   $("<td/>", {html: extra_info.join("</br>")}).appendTo(row);
   return(row);
-}
+};
 
 getTypeSpecificDates = function (dates, type) {
   var start;
