@@ -183,7 +183,7 @@ buildCoverageHTML = function (data) {
 
   // Build primary insurance
   if (data['primary_insurance'] && data['primary_insurance']['name']) {
-    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'],data['plan'])));
+    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'], data['plan'])));
   }
 
   // Build plan detail
@@ -196,6 +196,11 @@ buildCoverageHTML = function (data) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
   }
 
+  // Build plan maximums and deductibles
+  if (data['plan'] && data['plan']['financials']) {
+    coverageSection.append(buildPanelUI('Plan Maximums and Deductibles', buildMaximumDeductibles(data['plan']['financials'])));
+  }
+
   // Build plan coverage
   if (data['plan'] && data['plan']['financials']) {
     coverageSection.append(buildPanelUI('Health Benefit Plan Coverage', buildFinancials(data['plan']['financials'])));
@@ -204,7 +209,7 @@ buildCoverageHTML = function (data) {
   // Adding Service details
   if (data['services'] && data['services'].length > 0) {
     var div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
-    $.each(data['services'], function(idx, service) {
+    $.each(data['services'], function (idx, service) {
       if (coverageStatus(service) == "Active") {
         if (div.children().length == 2) {
           div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
@@ -238,7 +243,7 @@ buildPanelUI = function (title, content) {
   contentPanel.append(content);
   panel.append(contentPanel);
 
-  panel.addClass(title.replace(/ /g,'').toLowerCase());
+  panel.addClass(title.replace(/ /g, '-').toLowerCase());
   return panel;
 }
 
@@ -431,7 +436,322 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
   return(table);
 }
 
-buildFinancials = function(data) {
+buildMaximumDeductibles = function (data) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var rowHead2 = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var rows = null;
+
+  $("<th/>", {rowSpan: 2, text: "Network"}).appendTo(rowHead);
+  $("<th/>", {rowSpan: 2, text: "Additional Information"}).appendTo(rowHead);
+  $("<th/>", {colSpan: 4, text: "Individual"}).addClass("text-center right-grey-border left-grey-border").appendTo(rowHead);
+  $("<th/>", {colSpan: 4, text: "Family"}).addClass("text-center right-grey-border").appendTo(rowHead);
+  $("<th/>", {text: "Deductible"}).addClass("left-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Deductible Remaining"}).appendTo(rowHead2);
+  $("<th/>", {text: "Maximum"}).appendTo(rowHead2);
+  $("<th/>", {text: "Maximum Remaining"}).addClass("right-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Deductible"}).appendTo(rowHead2);
+  $("<th/>", {text: "Deductible Remaining"}).appendTo(rowHead2);
+  $("<th/>", {text: "Maximum"}).appendTo(rowHead2);
+  $("<th/>", {text: "Maximum Remaining"}).addClass("right-grey-border").appendTo(rowHead2);
+
+  row1 = new Array(10);
+  row1[0] = $("<td/>", {text: "IN"});
+  for (var i = 1; i < 10; i++) {
+    row1[i] = $("<td/>", {text: ""});
+  }
+  row2 = new Array(10);
+  row2[0] = $("<td/>", {text: "OUT"});
+  for (var i = 1; i < 10; i++) {
+    row2[i] = $("<td/>", {text: ""});
+  }
+
+
+  $.each(data, function (key) {
+    item = data[key];
+
+    if (key == 'deductible') {
+      // In Network Deductible Totals
+      if (item['totals'] && item['totals']['in_network'] && item['totals']['in_network'].length > 0) {
+        $.each(item['totals']['in_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row1[2] = $("<td/>", {text: amount});
+          } else {
+            row1[6] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+
+        });
+      }
+      // In Network Deductible Remaining
+      if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['in_network'].length > 0) {
+        $.each(item['remainings']['in_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row1[3] = $("<td/>", {text: amount});
+          } else {
+            row1[7] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+
+        });
+      }
+
+      // Out Network Deductible Totals
+      if (item['totals'] && item['totals']['out_network'] && item['totals']['out_network'].length > 0) {
+        $.each(item['totals']['out_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row2[2] = $("<td/>", {text: amount});
+          } else {
+            row2[6] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+
+        });
+      }
+      // Out Network Deductible Remaining
+      if (item['remainings'] && item['remainings']['out_network'] && item['remainings']['out_network'].length > 0) {
+        $.each(item['remainings']['out_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row2[3] = $("<td/>", {text: amount});
+          } else {
+            row2[7] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+
+        });
+      }
+    }
+
+    if (key == 'stop_loss') {
+      // In Network Stop Loss Totals
+      if (item['totals'] && item['totals']['in_network'] && item['totals']['in_network'].length > 0) {
+        $.each(item['totals']['in_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row1[4] = $("<td/>", {text: amount});
+          } else {
+            row1[8] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+        });
+      }
+      // In Network Stop Loss Remaining
+      if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['in_network'].length > 0) {
+        $.each(item['remainings']['in_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row1[5] = $("<td/>", {text: amount});
+          } else {
+            row1[9] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+        });
+      }
+
+      // Out Network Stop Loss Totals
+      if (item['totals'] && item['totals']['out_network'] && item['totals']['out_network'].length > 0) {
+        $.each(item['totals']['out_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row2[4] = $("<td/>", {text: amount});
+          } else {
+            row2[8] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+        });
+      }
+      // Out Network Stop Loss Remaining
+      if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['out_network'].length > 0) {
+        $.each(item['remainings']['out_network'], function (idx, info) {
+          var level = info['level'];
+          var amount = null;
+
+          if (info['amount'] && info['amount'].length > 0)
+            amount = parseAmount(info['amount']);
+          else if (info['percent'] && info['percent'].length > 0)
+            amount = "% " + info['percent'];
+
+          if (level == 'INDIVIDUAL') {
+            row2[5] = $("<td/>", {text: amount});
+          } else {
+            row2[9] = $("<td/>", {text: amount});
+          }
+
+          var extra_info = new Array();
+          if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
+            extra_info.push(info['insurance_type_label']);
+          }
+          if (info['comments'] && info['comments'].length > 0) {
+            $.each(info['comments'], function (idx, value) {
+              extra_info.push(value);
+            });
+          }
+          if (extra_info.length > 0) {
+            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+          }
+        });
+      }
+    }
+  });
+
+  var add_row = false;
+  for (var i = 2; i < 10; i++) {
+    if ($(row1[i]).text().length > 0)
+      add_row = true;
+  }
+  if (add_row)
+    tableBody.append($("<tr/>", {html: row1}));
+
+  add_row = false
+  for (var i = 2; i < 10; i++)
+    if ($(row2[i]).text().length > 0)
+      add_row = true;
+  if (add_row)
+    tableBody.append($("<tr/>", {html: row2}));
+
+  return(table);
+}
+
+buildFinancials = function (data) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -451,7 +771,7 @@ buildFinancials = function(data) {
     $(rows[0]).addClass("warning");
     $(rows[0]).children().eq(0).text('In');
     $(rows[0]).children().eq(1).text('Individual');
-    $.each(rows, function(idx, row) {
+    $.each(rows, function (idx, row) {
       tableBody.append(row);
     });
   }
@@ -462,7 +782,7 @@ buildFinancials = function(data) {
     $(rows[0]).addClass("warning");
     $(rows[0]).children().eq(0).text('In');
     $(rows[0]).children().eq(1).text('Family');
-    $.each(rows, function(idx, row) {
+    $.each(rows, function (idx, row) {
       tableBody.append(row);
     });
   }
@@ -473,7 +793,7 @@ buildFinancials = function(data) {
     $(rows[0]).addClass("warning");
     $(rows[0]).children().eq(0).text('Out');
     $(rows[0]).children().eq(1).text('Individual');
-    $.each(rows, function(idx, row) {
+    $.each(rows, function (idx, row) {
       tableBody.append(row);
     });
   }
@@ -484,7 +804,7 @@ buildFinancials = function(data) {
     $(rows[0]).addClass("warning");
     $(rows[0]).children().eq(0).text('Out');
     $(rows[0]).children().eq(1).text('Family');
-    $.each(rows, function(idx, row) {
+    $.each(rows, function (idx, row) {
       tableBody.append(row);
     });
   }
@@ -492,15 +812,15 @@ buildFinancials = function(data) {
   return(table);
 }
 
-buildFinancialRows = function(data, network, level) {
+buildFinancialRows = function (data, network, level) {
   var rows = new Array();
 
-  $.each(data, function(key) {
+  $.each(data, function (key) {
     item = data[key];
     if (typeof(item) === 'object') {
       // Remainings
       if (item['remainings'] && item['remainings'][network] && item['remainings'][network].length > 0) {
-        $.each(item['remainings'][network], function(idx, info) {
+        $.each(item['remainings'][network], function (idx, info) {
           if (info['level'] == level) {
             rows.push(buildFinancialRow(network, level, key, 'Remain', info));
           }
@@ -508,7 +828,7 @@ buildFinancialRows = function(data, network, level) {
       }
       // Totals
       if (item['totals'] && item['totals'][network] && item['totals'][network].length > 0) {
-        $.each(item['totals'][network], function(idx, info) {
+        $.each(item['totals'][network], function (idx, info) {
           if (info['level'] == level) {
             rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
           }
@@ -518,7 +838,7 @@ buildFinancialRows = function(data, network, level) {
       if (item['percents'] && typeof(item['percents']) === 'object') {
         // Remainings
         if (item['percents'][network] && item['percents'][network].length > 0) {
-          $.each(item['percents'][network], function(idx, info) {
+          $.each(item['percents'][network], function (idx, info) {
             if (info['level'] == level) {
               rows.push(buildFinancialRow(network, level, key, 'Remain', info));
             }
@@ -526,7 +846,7 @@ buildFinancialRows = function(data, network, level) {
         }
         // Totals
         if (item['percents'][network] && item['percents'][network].length > 0) {
-          $.each(item['percents'][network], function(idx, info) {
+          $.each(item['percents'][network], function (idx, info) {
             if (info['level'] == level) {
               rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
             }
@@ -537,7 +857,7 @@ buildFinancialRows = function(data, network, level) {
       if (item['amounts'] && typeof(item['amounts']) === 'object') {
         // Remainings
         if (item['amounts'][network] && item['amounts'][network].length > 0) {
-          $.each(item['amounts'][network], function(idx, info) {
+          $.each(item['amounts'][network], function (idx, info) {
             if (info['level'] == level) {
               rows.push(buildFinancialRow(network, level, key, 'Remain', info));
             }
@@ -545,7 +865,7 @@ buildFinancialRows = function(data, network, level) {
         }
         // Totals
         if (item['amounts'][network] && item['amounts'][network].length > 0) {
-          $.each(item['amounts'][network], function(idx, info) {
+          $.each(item['amounts'][network], function (idx, info) {
             if (info['level'] == level) {
               rows.push(buildFinancialRow(network, level, key, info['time_period_label'], info));
             }
@@ -558,7 +878,7 @@ buildFinancialRows = function(data, network, level) {
   return(rows);
 }
 
-buildFinancialRow = function(network, level, type, period, item) {
+buildFinancialRow = function (network, level, type, period, item) {
   row = $("<tr/>");
   $("<td/>").appendTo(row);
   $("<td/>").appendTo(row);
@@ -571,7 +891,7 @@ buildFinancialRow = function(network, level, type, period, item) {
   if (item['amount'] && item['amount'].length > 0)
     $("<td/>", {text: "$ " + item['amount'] + ".00"}).appendTo(row);
   else if (item['percent'] && item['percent'].length > 0)
-    $("<td/>", {text: "% " +item['percent']}).appendTo(row);
+    $("<td/>", {text: "% " + item['percent']}).appendTo(row);
   $("<td/>", {text: period}).appendTo(row);
 
   var extra_info = new Array();
@@ -579,13 +899,21 @@ buildFinancialRow = function(network, level, type, period, item) {
     extra_info.push(item['insurance_type_label']);
   }
   if (item['comments'] && item['comments'].length > 0) {
-    $.each(item['comments'], function(idx, value) {
+    $.each(item['comments'], function (idx, value) {
       extra_info.push(value);
     });
   }
 
   $("<td/>", {html: extra_info.join("</br>")}).appendTo(row);
   return(row);
+}
+
+parseAmount = function (amount) {
+  if (amount.indexOf(".")) {
+    return("$ " + amount);
+  } else {
+    return("$ " + amount + ".00");
+  }
 }
 
 getTypeSpecificDates = function (dates, type) {
