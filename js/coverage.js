@@ -209,20 +209,21 @@ buildCoverageHTML = function (data) {
 
   // Adding Service details
   if (data['services'] && data['services'].length > 0) {
+    var div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
     $.each(data['services'], function(idx, service) {
-      console.log(service);
-      console.log(coverageStatus(service));
       if (coverageStatus(service) == "Active") {
-        coverageSection.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
+        if (div.children().length == 2) {
+          div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
+        }
+        div.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
       }
     });
   }
 
   var body = $('body');
-  var subscriberSection = $(document.createElement('section')).addClass('subscriber-section');
-  var insuranceSection = $(document.createElement('section')).addClass('insurance-section');
-  var coverageStatusSection = $(document.createElement('section')).addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
-
+  var subscriberSection = $("<section/>").addClass('subscriber-section');
+  var insuranceSection = $("<section/>").addClass('insurance-section');
+  var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
 
   coverageSection.appendTo(body);
   subscriberSection.prependTo(coverageSection);
@@ -231,9 +232,11 @@ buildCoverageHTML = function (data) {
   // additionalInsuranceSection.insertAfter(subscriberSection);
 
   // Adding classes for styling --
+
   $('.patient').appendTo(subscriberSection);
   $('.dependent').appendTo(subscriberSection);
   $('.primary-insurance').appendTo(insuranceSection); //$('[class*="insurance"]').appendTo(insuranceSection);
+
   $('.plan').appendTo(insuranceSection);
   coverageStatusSection.find('.coverage-status').text($('.coverage-status-text').text());
 };
@@ -245,8 +248,7 @@ buildPanelUI = function (title, content) {
   contentPanel.append(content);
   panel.append(contentPanel);
 
-  // --
-  panel.addClass(title.replace(/ /g,'-').toLowerCase());
+  panel.addClass(title.replace(/ /g,'').toLowerCase());
   return panel;
 }
 
