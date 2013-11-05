@@ -170,7 +170,7 @@ buildError = function (error) {
 
 buildCoverageHTML = function (data) {
   var coverageSection = $("<section/>").addClass("eligible-plugin-coverage-template");
-  // var additionalInsuranceSection;
+  var additionalInsuranceSection;
 
   // Build demographics
   if (data['demographics']) {
@@ -182,27 +182,24 @@ buildCoverageHTML = function (data) {
     }
   }
 
-  // Build primary insurance
-  if (data['primary_insurance'] && data['primary_insurance']['name']) {
+  // // Build primary insurance
+  // if (data['primary_insurance'] && data['primary_insurance']['name']) {
+  //   coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'])));
+  // }
 
-    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'])));
-
-    coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'], data['plan'])));
-  }
-
-  // Build plan detail
-  if (data['plan'] && data['plan']['coverage_status']) {
-    coverageSection.append(buildPanelUI('Plan', buildPlan(data['plan'])));
-    // --
-    coverageSection.append(buildPanelUI('Plan', buildPlan(data['demographics']['subscriber'])));
-    coverageSection.append(buildPanelUI('Plan', buildPlan(data['primary_insurance'])));
-  }
+  // // Build plan detail
+  // if (data['plan'] && data['plan']['coverage_status']) {
+  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['plan'])));
+  //   // --
+  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['demographics']['subscriber'])));
+  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['primary_insurance'])));
+  // }
 
   // Build additional insurance policies
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
 
-    // additionalInsuranceSection = $(document.createElement('section')).addClass('additional-insurance-section').append('<p>Other insurance policies were found. Click below to see details</p>');
+    additionalInsuranceSection = $(document.createElement('section')).addClass('additional-insurance-section').append('<p>Other insurance policies were found. Click below to see details</p>');
   }
 
   // Build plan maximums and deductibles
@@ -230,20 +227,33 @@ buildCoverageHTML = function (data) {
 
   var body = $('body');
   var subscriberSection = $("<section/>").addClass('subscriber-section');
-  var insuranceSection = $("<section/>").addClass('insurance-section');
-  var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
+  var insuranceSection = $('.insurance-section');
+  //var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
 
   coverageSection.appendTo(body);
   subscriberSection.prependTo(coverageSection);
   insuranceSection.insertAfter(subscriberSection);
-  coverageStatusSection.insertAfter(insuranceSection);
-  // additionalInsuranceSection.insertAfter(subscriberSection);
+  //coverageStatusSection.insertAfter(insuranceSection);
+
+
+
 
   // Adding classes for styling --
 
   $('.patient').appendTo(subscriberSection);
   $('.dependent').appendTo(subscriberSection);
   $('.primary-insurance').appendTo(insuranceSection); //$('[class*="insurance"]').appendTo(insuranceSection);
+
+
+  if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
+    additionalInsuranceSection.appendTo(subscriberSection);
+
+    //Adding links to additional insurance information
+    $.each(data['plan']['additional_insurance_policies'], function(index, key) {
+      additionalInsuranceSection.append('<a href="#">link'+index+'</a><br/>'); //temp
+    });
+
+  }
 
   $('.plan').appendTo(insuranceSection);
   coverageStatusSection.find('.coverage-status').text($('.coverage-status-text').text());
@@ -490,14 +500,16 @@ buildMaximumDeductibles = function (data) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
-  var rowHead2 = $("<tr></tr>").appendTo(tableHead);
+  var rowHead2 = $("<tr class='warning'></tr>").appendTo(tableHead);
   var tableBody = $("<tbody/>").appendTo(table);
   var rows = null;
 
-  $("<th/>", {rowSpan: 2, text: "Network"}).appendTo(rowHead);
-  $("<th/>", {rowSpan: 2, text: "Additional Information"}).appendTo(rowHead);
+  $("<th/>", {colSpan: 2, text: ""}).appendTo(rowHead);
   $("<th/>", {colSpan: 4, text: "Individual"}).addClass("text-center right-grey-border left-grey-border").appendTo(rowHead);
   $("<th/>", {colSpan: 4, text: "Family"}).addClass("text-center right-grey-border").appendTo(rowHead);
+
+  $("<th/>", {text: "Network"}).appendTo(rowHead2);
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead2);
   $("<th/>", {text: "Deductible"}).addClass("left-grey-border").appendTo(rowHead2);
   $("<th/>", {text: "Deductible Remaining"}).appendTo(rowHead2);
   $("<th/>", {text: "Maximum"}).appendTo(rowHead2);
