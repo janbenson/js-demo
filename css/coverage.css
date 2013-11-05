@@ -69,8 +69,6 @@
 	border-bottom: 5px solid #eee;
 }
 
-<<<<<<< HEAD
-
 .plan .panel-heading {
 	display: none;
 }
@@ -88,9 +86,6 @@
 }
 
 .healthbenefitplancoverage {
-=======
-.plan-maximums-and-deductibles, .health-benefit-plan-coverage {
->>>>>>> 780099c0495f0e51f122f939c718d6148824f63e
   width: 100%;
   clear: both;
 }
