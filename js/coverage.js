@@ -193,7 +193,7 @@ buildCoverageHTML = function (data) {
       buildPanelUI('Plan', buildInsuranceSection3(data['plan'], data['demographics']['subscriber'])).appendTo(insuranceSection);
     }
 
-    if (data['primary_insurance'] && data['primary_insurance']['service_providers'] && data['primary_insurance']['service_providers'].length > 0) {
+    if (data['primary_insurance'] && data['primary_insurance']['service_providers'] && data['primary_insurance']['service_providers']['physicians'] && data['primary_insurance']['service_providers']['physicians'].length > 0) {
       buildPanelUI('Plan', buildInsuranceSection4(data['primary_insurance']['service_providers'])).appendTo(insuranceSection);
     }
   }
@@ -338,8 +338,10 @@ buildInsuranceSection1 = function(primaryInsurance) {
   $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
 
   $("<th/>", {text: "Insurance Type"}).appendTo(rowHead);
+  $("<td/>", {text: "TODO"}).appendTo(row);
 
   $("<th/>", {text: "Member Type"}).appendTo(rowHead);
+  $("<td/>", {text: "TODO"}).appendTo(row);
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
@@ -420,22 +422,30 @@ buildInsuranceSection4 = function(service_providers) {
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
   var tableBody = $("<tbody/>").appendTo(table);
-  var row = $("<tr></tr>").appendTo(tableBody);
 
   $("<th/>", {text: "Group Providers"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
 
   $("<th/>", {text: "Type"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
 
   $("<th/>", {text: "Name"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
 
   $("<th/>", {text: "Contacts"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
 
   $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
+
+  $.each(service_providers['physicians'], function(idx, item) {
+    var row = $("<tr></tr>").appendTo(tableBody);
+
+    contact = item['contact_details'][0];
+
+    $("<td/>", {text: ""}).appendTo(row);
+    $("<td/>", {text: item['insurance_type_label']}).appendTo(row);
+    $("<td/>", {text: parseName(contact)}).appendTo(row);
+    $("<td/>", {html: parseContacts(contact['contacts'])}).appendTo(row);
+    $("<td/>", {html: parseComments(item['comments'])}).appendTo(row);
+
+    tableBody.append(row);
+  });
 
   return(table);
 }
