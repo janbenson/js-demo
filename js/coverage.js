@@ -23,8 +23,6 @@ successCallback = function (data) {
   } else {
     buildCoverageHTML(data);
   }
-
-  //$("#benefits_accordion").accordion();
 }
 
 objectToUrlParameters = function (obj) {
@@ -182,24 +180,31 @@ buildCoverageHTML = function (data) {
     }
   }
 
-  // // Build primary insurance
-  // if (data['primary_insurance'] && data['primary_insurance']['name']) {
-  //   coverageSection.append(buildPanelUI('Primary Insurance', buildPrimaryInsurance(data['primary_insurance'])));
-  // }
+  var insuranceSection = $("<section/>").addClass("insurance-section");
 
-  // // Build plan detail
-  // if (data['plan'] && data['plan']['coverage_status']) {
-  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['plan'])));
-  //   // --
-  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['demographics']['subscriber'])));
-  //   coverageSection.append(buildPanelUI('Plan', buildPlan(data['primary_insurance'])));
-  // }
+  if (data['primary_insurance'] && data['primary_insurance']['name']) {
+    buildPanelUI('Insurance', buildInsuranceSection1(data['primary_insurance'])).appendTo(insuranceSection);
+  }
+
+  if (data['plan']) {
+    buildPanelUI('Plan', buildInsuranceSection2(data['plan'])).appendTo(insuranceSection);
+
+    if (data['demographics'] && data['demographics']['subscriber']) {
+      buildPanelUI('Plan', buildInsuranceSection3(data['plan'], data['demographics']['subscriber'])).appendTo(insuranceSection);
+    }
+
+    if (data['primary_insurance'] && data['primary_insurance']['service_providers'] && data['primary_insurance']['service_providers'].length > 0) {
+      buildPanelUI('Plan', buildInsuranceSection4(data['primary_insurance']['service_providers'])).appendTo(insuranceSection);
+    }
+  }
 
   // Build additional insurance policies
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
 
-    additionalInsuranceSection = $(document.createElement('section')).addClass('additional-insurance-section').append('<p>Other insurance policies were found. Click below to see details</p>');
+    additionalInsuranceSection = $("<section/>").
+      addClass('additional-insurance-section').
+      append('<p>Other insurance policies were found. Click below to see details</p>');
   }
 
   // Build plan maximums and deductibles
@@ -227,32 +232,26 @@ buildCoverageHTML = function (data) {
 
   var body = $('body');
   var subscriberSection = $("<section/>").addClass('subscriber-section');
-  var insuranceSection = $('.insurance-section');
-  //var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
+  var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
 
   coverageSection.appendTo(body);
   subscriberSection.prependTo(coverageSection);
   insuranceSection.insertAfter(subscriberSection);
-  //coverageStatusSection.insertAfter(insuranceSection);
+  coverageStatusSection.insertAfter(insuranceSection);
 
-
-
-
-  // Adding classes for styling --
+  // Adding classes for styling
 
   $('.patient').appendTo(subscriberSection);
   $('.dependent').appendTo(subscriberSection);
-  $('.primary-insurance').appendTo(insuranceSection); //$('[class*="insurance"]').appendTo(insuranceSection);
-
+  $('.primary-insurance').appendTo(insuranceSection);
 
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     additionalInsuranceSection.appendTo(subscriberSection);
 
     //Adding links to additional insurance information
     $.each(data['plan']['additional_insurance_policies'], function(index, key) {
-      additionalInsuranceSection.append('<a href="#">link'+index+'</a><br/>'); //temp
+      additionalInsuranceSection.append('<a href="#">link ' + (index + 1) +' </a><br/>');
     });
-
   }
 
   $('.plan').appendTo(insuranceSection);
@@ -292,8 +291,6 @@ buildDemographics = function (person) {
   // $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
   // $("<td/>", {html: parsePersonAdditionalInfo(person).join("<br/>")}).appendTo(row);
 
-
-
   return(table);
 }
 
@@ -330,7 +327,7 @@ parsePersonAdditionalInfo = function (person) {
   return additionalInformation;
 }
 
-buildPrimaryInsurance = function (primaryInsurance) {
+buildInsuranceSection1 = function(primaryInsurance) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -340,15 +337,9 @@ buildPrimaryInsurance = function (primaryInsurance) {
   $("<th/>", {text: "Name"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
 
-
-
   $("<th/>", {text: "Insurance Type"}).appendTo(rowHead);
-  $("<td/>", {text: "fill in"}).appendTo(row);
 
   $("<th/>", {text: "Member Type"}).appendTo(rowHead);
-  $("<td/>", {text: "fill in"}).appendTo(row);
-
-
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
@@ -359,115 +350,95 @@ buildPrimaryInsurance = function (primaryInsurance) {
   return(table);
 }
 
-buildPlan = function (plan) {
+buildInsuranceSection2 = function(plan) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var row = $("<tr></tr>").appendTo(tableBody).addClass("warning");
+
+  $("<th/>", {text: "Coverage"}).appendTo(rowHead);
+  $("<td/>", {text: coverageStatus(plan)}).addClass("coverage-status-text").appendTo(row);
+
+  $("<th/>", {text: "Type"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
+  $("<td/>", {text: plan['plan_name']}).appendTo(row);
+
+  $("<th/>", {text: "Plan Number"}).appendTo(rowHead);
+  $("<td/>", {text: plan['plan_number']}).appendTo(row);
+
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+  $("<td/>", {html: parseComments(plan['comments']).join("<br/>")}).appendTo(row);
+
+  return(table);
+}
+
+buildInsuranceSection3 = function(plan, subscriber) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
   var tableBody = $("<tbody/>").appendTo(table);
   var row = $("<tr></tr>").appendTo(tableBody);
 
-  // var row2 = $("<tr></tr>").appendTo(tableBody);
-  // var cell2 = $("<td/>").appendTo(row2);
-  // var table2 = $("<table class=\"table table-hover\"/>").appendTo(cell2);
+  $("<th/>", {text: "Group ID"}).appendTo(rowHead);
+  $("<td/>", {text: subscriber['group_id']}).appendTo(row);
 
-  // var tableHeadInside = $("<thead></thead>").appendTo(table2);
-  // var rowHeadInside = $("<tr></tr>").appendTo(tableHeadInside);
-  // var tableBodyInside = $("<tbody/>").appendTo(table2);
-  // var rowInside = $("<tr></tr>").appendTo(tableBodyInside);
+  $("<th/>", {text: "Group Name"}).appendTo(rowHead);
+  $("<td/>", {text: subscriber['group_name']}).appendTo(row);
 
-
-  //temporary solution
-  if(plan['member_id']) {
-
-    $("<th/>", {text: "Group ID"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_id']}).appendTo(row);
-
-    $("<th/>", {text: "Group Name"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    $("<th/>", {text: "Dates"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    $("<th/>", {text: "Subscriber Info"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    return(table);
-  }
-
-  if(plan['contacts']) {
-
-    $("<th/>", {text: "Group Providers"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_id']}).appendTo(row);
-
-    $("<th/>", {text: "Type"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    $("<th/>", {text: "Name"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    $("<th/>", {text: "Contacts"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-
-    return(table);
-  }
-
-  rowHead.append("<th>Coverage</th>");
-  row.append("<td class='coverage-status-text'>" + coverageStatus(plan) + "</td>");
-
-
-  if (plan['plan_type_label'] && plan['plan_type_label'].length > 0) {
-    $("<th/>", {text: "Type"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
-  }
-
-  if (plan['plan_name'] && plan['plan_name'].length > 0) {
-    $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_name']}).appendTo(row);
-  }
-
-  if (plan['plan_number'] && plan['plan_number'].length > 0) {
-    $("<th/>", {text: "Plan Number"}).appendTo(rowHead);
-    $("<td/>", {text: plan['plan_number']}).appendTo(row);
-  }
-
-  rowHead.append("<th>Additional Information</th>");
-  row.append("<td>fill in</td>");
-
-
-
-  if (plan['group_name'] && plan['group_name'].length > 0) {
-    $("<th/>", {text: "Group Name"}).appendTo(rowHead);
-    $("<td/>", {text: plan['group_name']}).appendTo(row);
-  }
-
-
-
+  $("<th/>", {text: "Dates"}).appendTo(rowHead);
+  var dates = new Array();
   if (plan['dates']) {
     var eligibleDates = getTypeSpecificDates(plan['dates'], "eligibilty");
     var planDates = getTypeSpecificDates(plan['dates'], "plan");
     var serviceDates = getTypeSpecificDates(plan['dates'], "service");
 
     if (eligibleDates && eligibleDates.length > 0) {
-      $("<th/>", {text: "Eligible"}).appendTo(rowHead);
-      $("<td/>", {text: eligibleDates}).appendTo(row);
+      dates.push("Eligible: " + eligibleDates);
     }
 
     if (planDates && planDates.length > 0) {
-      $("<th/>", {text: "Plan"}).appendTo(rowHead);
-      $("<td/>", {text: planDates}).appendTo(row);
+      dates.push("Plan: " + planDates);
     }
 
     if (serviceDates && serviceDates.length > 0) {
-      $("<th/>", {text: "Service"}).appendTo(rowHead);
-      $("<td/>", {text: serviceDates}).appendTo(row);
+      dates.push("Service: " + serviceDates);
     }
   }
+  $("<td/>", {html: dates.join("<br/>")}).appendTo(row);
+
+  $("<th/>", {text: "Subscriber Info"}).appendTo(rowHead);
+  $("<td/>", {html: parseNameAndAddress(subscriber).join("<br/>")}).appendTo(row);
 
   return(table);
-};
+}
+
+buildInsuranceSection4 = function(service_providers) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var row = $("<tr></tr>").appendTo(tableBody);
+
+  $("<th/>", {text: "Group Providers"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  $("<th/>", {text: "Type"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  $("<th/>", {text: "Name"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  $("<th/>", {text: "Contacts"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
+  $("<td/>", {text: ""}).appendTo(row);
+
+  return(table);
+}
 
 buildAdditionalInsurancePolicies = function (additionalPolicies) {
   var table = $("<table class=\"table table-hover\"/>");
@@ -1029,9 +1000,11 @@ parseDates = function (dates) {
 parseComments = function (comments) {
   var list = new Array();
 
-  $.each(comments, function (index, comment) {
-    list.push(comment);
-  });
+  if (comments) {
+    $.each(comments, function (index, comment) {
+      list.push(comment);
+    });
+  }
 
   return(list);
 };

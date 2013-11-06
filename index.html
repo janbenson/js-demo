@@ -29,6 +29,7 @@
 
     <div class="form-group">
       <label for="member_dob" class="col-lg-2 control-label">Test?</label>
+
       <div class="col-lg-10">
         <input type="radio" name="test" id="test_yes" value="true" checked="checked"> Yes
         <input type="radio" name="test" id="test_no" value="false"> No
@@ -37,6 +38,7 @@
 
     <div class="form-group">
       <label for="api_key" class="col-lg-2 control-label">API Key</label>
+
       <div class="col-lg-10">
         <input type="text" class="form-control" id="api_key">
       </div>
@@ -44,6 +46,7 @@
 
     <div class="form-group test-param">
       <label for="test_member_id" class="col-lg-2 control-label">Test Member ID</label>
+
       <div class="col-lg-10">
         <select class="form-control" id="test_member_id">
           <option value="U44441234">U44441234 - enrollment required</option>
@@ -51,7 +54,8 @@
           <option value="X22222222" selected="selected">X22222222 - dependent</option>
           <option value="W11111111">W11111111 - inactive plan</option>
           <option value="A22222222">A22222222 - active, deductible, stop loss, etc plan</option>
-          <option value="TRE1111110">TRE1111110 - diagnostic lab (STC 5) coinsurance and other financial information</option>
+          <option value="TRE1111110">TRE1111110 - diagnostic lab (STC 5) coinsurance and other financial information
+          </option>
           <option value="W99999999">W99999999 - Member has a health spending account</option>
           <option value="T434343">T434343 - Secondary insurance example (with Medicare A &amp; B information)</option>
           <option value="44444444A">44444444A - Medicare is secondary, other insurance company is primary</option>
@@ -64,6 +68,7 @@
 
     <div class="form-group real-param" style="display: none;">
       <label for="payer_id" class="col-lg-2 control-label">Payer ID</label>
+
       <div class="col-lg-10">
         <input type="text" class="form-control" id="payer_id">
       </div>
@@ -74,6 +79,7 @@
 
       <div class="form-group real-param">
         <label for="provider_npi" class="col-lg-2 control-label">NPI</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="provider_npi">
         </div>
@@ -81,6 +87,7 @@
 
       <div class="form-group real-param">
         <label for="provider_last_name" class="col-lg-2 control-label">Last Name</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="provider_last_name">
         </div>
@@ -88,6 +95,7 @@
 
       <div class="form-group real-param">
         <label for="provider_first_name" class="col-lg-2 control-label">First Name</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="provider_first_name">
         </div>
@@ -100,6 +108,7 @@
 
       <div class="form-group real-param">
         <label for="member_id" class="col-lg-2 control-label">ID</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="member_id">
         </div>
@@ -107,6 +116,7 @@
 
       <div class="form-group real-param">
         <label for="member_last_name" class="col-lg-2 control-label">Last Name</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="member_last_name">
         </div>
@@ -114,6 +124,7 @@
 
       <div class="form-group real-param">
         <label for="member_first_name" class="col-lg-2 control-label">First Name</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="member_first_name">
         </div>
@@ -121,6 +132,7 @@
 
       <div class="form-group real-param">
         <label for="member_dob" class="col-lg-2 control-label">DOB</label>
+
         <div class="col-lg-10">
           <input type="text" class="form-control" id="member_dob">
         </div>
@@ -138,188 +150,6 @@
 
 </div>
 
-<section class="insurance-section">
-<div class="panel panel-default primary-insurance">
-  <div class="panel-heading">
-    <h4>Insurance</h4>
-  </div>
-  <div class="panel-body">
-    <table class="table table-hover">
-    <thead>
-    <tr>
-      <th>
-        Name
-      </th>
-      <th>
-        Insurance Type
-      </th>
-      <th>
-        Member Type
-      </th>
-      <th>
-        ID
-      </th>
-      <th>
-        Contacts
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td>
-        AETNA INC
-      </td>
-      <td>
-        Primary payer
-      </td>
-      <td>
-        Dependent
-      </td>
-      <td>
-        00002
-      </td>
-      <td>
-      </td>
-    </tr>
-    </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="panel panel-default plan">
-  <div class="panel-heading">
-    <h4>Plan</h4>
-  </div>
-  <div class="panel-body">
-    <table class="table table-hover">
-    <thead>
-    <tr>
-      <th>
-        Coverage
-      </th>
-      <th>
-        Type
-      </th>
-      <th>
-        Plan Name
-      </th>
-      <th>
-        Plan Number
-      </th>
-      <th>
-        Additional Information
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="warning">
-      <td class="coverage-status-text">
-        Active
-      </td>
-      <td>
-        POS
-      </td>
-      <td>
-        Aetna Choice POS II
-      </td>
-      <td>
-        542504205245
-      </td>
-      <td>
-        TOWER LOREM IPSUM SDSASDSA KSDJ
-      </td>
-    </tr>
-    </tbody>
-    </table>
-  </div>
-</div>
-<div class="panel panel-default plan">
-  <div class="panel-heading">
-    <h4>Plan</h4>
-  </div>
-  <div class="panel-body">
-    <table class="table table-hover">
-    <thead>
-    <tr>
-      <th>
-        Group ID
-      </th>
-      <th>
-        Group Name
-      </th>
-      <th>
-        Dates
-      </th>
-      <th>
-        Subscriber Info
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td>
-        70425 TRE
-      </td>
-      <td>
-        TRIUMPH GROUP INC.
-      </td>
-      <td>
-        1993-03-12-9999-12-10
-      </td>
-      <td>
-        Vanilla Chip<br/>
-        TRE111111110<br/>
-        1965-05-23
-      </td>
-    </tr>
-    </tbody>
-    </table>
-  </div>
-</div>
-<div class="panel panel-default plan">
-  <div class="panel-heading">
-    <h4>Plan</h4>
-  </div>
-  <div class="panel-body">
-    <table class="table table-hover">
-    <thead>
-    <tr>
-      <th>
-        Group Providers
-      </th>
-      <th>
-        Type
-      </th>
-      <th>
-        Name
-      </th>
-      <th>
-        Contacts
-      </th>
-      <th>
-        Additional Information
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="warning">
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-      </td>
-      <td>
-        PCP SELECTION NOT REQUIRED
-      </td>
-    </tr>
-    </tbody>
-    </table>
-  </div>
-</div>
-</section>
 
 </body>
 </html>
