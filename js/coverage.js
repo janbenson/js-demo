@@ -172,18 +172,17 @@ buildCoverageHTML = function (data) {
 
   // Build demographics
   if (data['demographics']) {
-    if (data['demographics']['subscriber'] && data['demographics']['subscriber']['first_name']) {
-      coverageSection.append(buildPanelUI('Patient', buildDemographics(data['demographics']['subscriber'], "Subscriber"))); //was 'Subscriber'
-    }
     if (data['demographics']['dependent'] && data['demographics']['dependent']['first_name']) {
-      coverageSection.append(buildPanelUI('Dependent', buildDemographics(data['demographics']['dependent'], "Dependent")));
+      coverageSection.append(buildPanelUI('Patient', buildDemographics(data['demographics']['dependent'], "Dependent")));
+    } else if (data['demographics']['subscriber'] && data['demographics']['subscriber']['first_name']) {
+      coverageSection.append(buildPanelUI('Patient', buildDemographics(data['demographics']['subscriber'], "Subscriber"))); //was 'Subscriber'
     }
   }
 
   var insuranceSection = $("<section/>").addClass("insurance-section");
 
   if (data['primary_insurance'] && data['primary_insurance']['name']) {
-    buildPanelUI('Insurance', buildInsuranceSection1(data['primary_insurance'])).appendTo(insuranceSection);
+    buildPanelUI('Insurance', buildInsuranceSection1(data['primary_insurance'], data['demographics'])).appendTo(insuranceSection);
   }
 
   if (data['plan']) {
@@ -327,7 +326,7 @@ parsePersonAdditionalInfo = function (person) {
   return additionalInformation;
 }
 
-buildInsuranceSection1 = function(primaryInsurance) {
+buildInsuranceSection1 = function(primaryInsurance, demographics) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -338,10 +337,14 @@ buildInsuranceSection1 = function(primaryInsurance) {
   $("<td/>", {text: primaryInsurance['name']}).appendTo(row);
 
   $("<th/>", {text: "Insurance Type"}).appendTo(rowHead);
-  $("<td/>", {text: "TODO"}).appendTo(row);
+  $("<td/>", {text: primaryInsurance['payer_type_label']}).appendTo(row); // v1.3
 
   $("<th/>", {text: "Member Type"}).appendTo(rowHead);
-  $("<td/>", {text: "TODO"}).appendTo(row);
+  if (demographics['dependent']) {
+    $("<td/>", {text: "Dependent"}).appendTo(row);
+  } else {
+    $("<td/>", {text: "Subscriber"}).appendTo(row);
+  }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
   $("<td/>", {text: primaryInsurance['id']}).appendTo(row);
