@@ -1,4 +1,6 @@
+// Uncomment 1.3 coverage_url to see plan comments and physicians type until its deployed into production
 coverage_url = "https://gds.eligibleapi.com/v1.1/coverage/all.json"
+//coverage_url = "https://staginggds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
@@ -442,7 +444,7 @@ buildInsuranceSection4 = function(service_providers) {
     contact = item['contact_details'][0];
 
     $("<td/>", {text: ""}).appendTo(row);
-    $("<td/>", {text: item['insurance_type_label']}).appendTo(row);
+    $("<td/>", {text: contact['entity_code_label']}).appendTo(row);
     $("<td/>", {text: parseName(contact)}).appendTo(row);
     $("<td/>", {html: parseContacts(contact['contacts'])}).appendTo(row);
     $("<td/>", {html: parseComments(item['comments'])}).appendTo(row);
