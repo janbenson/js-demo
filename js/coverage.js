@@ -56,7 +56,11 @@ coverageRequest = function (params) {
         successCallback($.parseJSON(data));
       } catch(err) {
         console.log(data);
-        alert(data);
+        if (data.indexOf("NPI")) {
+          alert("You should enroll your NPI though our website");
+        } else {
+          alert(data);
+        }
       }
     },
     error: function (xhr, textStatus, errorThrown) {
@@ -157,16 +161,18 @@ fetchTestCoverage = function () {
 buildError = function (error) {
   var coverageSection = $("<section/>").addClass("eligible-plugin-coverage-template");
 
-  var ul = $("<ul/>").appendTo(coverageSection);
-  $("<li/>", {"text": "Response Code: " + error['response_code']}).appendTo(ul);
-  $("<li/>", {"text": "Response Description: " + error['response_description']}).appendTo(ul);
-  $("<li/>", {"text": "Agency Qualifier Code: " + error['agency_qualifier_code']}).appendTo(ul);
-  $("<li/>", {"text": "Agency Qualifier Description: " + error['agency_qualifier_description']}).appendTo(ul);
-  $("<li/>", {"text": "Reject Reason Code: " + error['reject_reason_code']}).appendTo(ul);
-  $("<li/>", {"text": "Reject Reason Description: " + error['reject_reason_description']}).appendTo(ul);
-  $("<li/>", {"text": "Follow Up Action Code: " + error["follow-up_action_code"]}).appendTo(ul);
-  $("<li/>", {"text": "Follow Up Action Description: " + error["follow-up_action_description"]}).appendTo(ul);
-  $("<li/>", {"text": "Details: " + error['details']}).appendTo(ul);
+  var h1 = $("<h1/>", {text: error['reject_reason_description']}).appendTo(coverageSection);
+
+//  var ul = $("<ul/>").appendTo(coverageSection);
+//  $("<li/>", {"text": "Response Code: " + error['response_code']}).appendTo(ul);
+//  $("<li/>", {"text": "Response Description: " + error['response_description']}).appendTo(ul);
+//  $("<li/>", {"text": "Agency Qualifier Code: " + error['agency_qualifier_code']}).appendTo(ul);
+//  $("<li/>", {"text": "Agency Qualifier Description: " + error['agency_qualifier_description']}).appendTo(ul);
+//  $("<li/>", {"text": "Reject Reason Code: " + error['reject_reason_code']}).appendTo(ul);
+//  $("<li/>", {"text": "Reject Reason Description: " + error['reject_reason_description']}).appendTo(ul);
+//  $("<li/>", {"text": "Follow Up Action Code: " + error["follow-up_action_code"]}).appendTo(ul);
+//  $("<li/>", {"text": "Follow Up Action Description: " + error["follow-up_action_description"]}).appendTo(ul);
+//  $("<li/>", {"text": "Details: " + error['details']}).appendTo(ul);
 
   var body = $('body');
   coverageSection.appendTo(body);
