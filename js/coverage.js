@@ -221,15 +221,22 @@ buildCoverageHTML = function (data) {
   // Adding Service details
   if (data['services'] && data['services'].length > 0) {
     var div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
+
     $.each(data['services'], function (idx, service) {
       if (coverageStatus(service) == "Active") {
         if (div.children().length == 2) {
           div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
         }
-        div.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
+        if (service['financials']) {
+          div.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
+        }
+        if (service['facility']) {
+          div.append(buildPanelUI(service['type_label'], buildFinancials(service['facility'])));
+        }
       }
     });
   }
+
 
   var body = $('body');
   var subscriberSection = $("<section/>").addClass('subscriber-section');
@@ -429,13 +436,9 @@ buildInsuranceSection4 = function(service_providers) {
   var tableBody = $("<tbody/>").appendTo(table);
 
   $("<th/>", {text: "Group Providers"}).appendTo(rowHead);
-
   $("<th/>", {text: "Type"}).appendTo(rowHead);
-
   $("<th/>", {text: "Name"}).appendTo(rowHead);
-
   $("<th/>", {text: "Contacts"}).appendTo(rowHead);
-
   $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
 
   $.each(service_providers['physicians'], function(idx, item) {
