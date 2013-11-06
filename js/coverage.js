@@ -48,11 +48,16 @@ coverageRequest = function (params) {
       Accept: "application/json"
     },
     type: "GET",
-    dataType: "json",
+    dataType: "text",
     processData: false,
     success: function (data, textStatus, jqXHR) {
       console.log("GET Ajax Call SUCCESS URL:" + coverage_url + "?" + parameters + ", Status :" + textStatus)
-      successCallback(data);
+      try {
+        successCallback($.parseJSON(data));
+      } catch(err) {
+        console.log(data);
+        alert(data);
+      }
     },
     error: function (xhr, textStatus, errorThrown) {
       console.log("GET Ajax Call FAILURE URL:" + coverage_url + "?" + parameters + ", Status :", textStatus, ", Error: ", errorThrown)
