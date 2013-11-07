@@ -570,6 +570,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -580,7 +581,6 @@ buildMaximumDeductibles = function (data) {
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
           if (row_idx != null) {
             row = rows[row_idx];
-            console.log("MIRA: " + row);
           } else {
             row = new Array();
             for (var i = 1; i < 10; i++) {
@@ -593,7 +593,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -617,6 +617,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -639,7 +640,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -664,6 +665,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -686,7 +688,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -710,6 +712,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -732,7 +735,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -759,6 +762,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -781,7 +785,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -805,6 +809,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -827,7 +832,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -852,6 +857,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -874,7 +880,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -898,6 +904,7 @@ buildMaximumDeductibles = function (data) {
               additional_information.push(value);
             });
           }
+          additional_information.sort();
 
           var col_index = null;
           if (level == 'INDIVIDUAL')
@@ -920,7 +927,7 @@ buildMaximumDeductibles = function (data) {
           row[col_index] = $("<td/>", {text: amount});
 
           if ((additional_information.length > 0) && (row[1].text() == "")) {
-            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+            row[1] = $("<td/>", {html: additional_information.join("<br>")});
           }
         });
       }
@@ -937,7 +944,7 @@ buildMaximumDeductibles = function (data) {
 findMaximumMinimumRowIdx = function(rows, network, additional_information, col_index) {
   var ret = null;
   $.each(rows, function(row_idx, row) {
-    if (row[1].html() == additional_information.join("<br/>") && row[0].text() == network) {
+    if (row[1].html() == additional_information.join("<br>") && row[0].text() == network) {
       if (row[col_index].text() == "") {
         ret = row_idx;
       }
