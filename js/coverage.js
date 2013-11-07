@@ -403,7 +403,7 @@ buildInsuranceSection2 = function(plan) {
   $("<td/>", {text: coverageStatus(plan)}).addClass("coverage-status-text").appendTo(row);
 
   $("<th/>", {text: "Type"}).appendTo(rowHead);
-  $("<td/>", {text: ""}).appendTo(row);
+  $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
 
   $("<th/>", {text: "Plan Name"}).appendTo(rowHead);
   $("<td/>", {text: plan['plan_name']}).appendTo(row);
