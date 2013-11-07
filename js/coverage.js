@@ -472,20 +472,27 @@ buildInsuranceSection4 = function(service_providers) {
   $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
 
   $.each(service_providers['physicians'], function(idx, item) {
-    var row = $("<tr></tr>").appendTo(tableBody);
+    var row = $("<tr></tr>");
 
-    contact = item['contact_details'][0];
+    var contact = item['contact_details'][0];
 
-    $("<td/>", {text: ""}).appendTo(row);
-    $("<td/>", {text: contact['entity_code_label']}).appendTo(row);
-    $("<td/>", {text: parseName(contact)}).appendTo(row);
-    $("<td/>", {html: parseContacts(contact['contacts'])}).appendTo(row);
-    $("<td/>", {html: parseComments(item['comments'])}).appendTo(row);
+    if (contact) {
+      $("<td/>", {text: ""}).appendTo(row);
+      $("<td/>", {text: contact['entity_code_label']}).appendTo(row);
+      $("<td/>", {text: parseName(contact)}).appendTo(row);
+      $("<td/>", {html: parseContacts(contact['contacts'])}).appendTo(row);
+      $("<td/>", {html: parseComments(item['comments'])}).appendTo(row);
 
-    tableBody.append(row);
+      tableBody.append(row);
+      row.appendTo(tableBody);
+    }
   });
 
-  return(table);
+  if ($(tableBody).children().length > 0) {
+   return(table);
+  } else {
+    return(null);
+  }
 }
 
 buildAdditionalInsurancePolicies = function (additionalPolicies) {
