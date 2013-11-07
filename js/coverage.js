@@ -212,6 +212,11 @@ buildCoverageHTML = function (data) {
     }
   }
 
+  // Build plan maximums and deductibles
+  if (data['plan'] && data['plan']['financials']) {
+    coverageSection.append(buildPanelUI('Plan Maximums and Deductibles', buildMaximumDeductibles(data['plan']['financials'])));
+  }
+
   // Build additional insurance policies
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
@@ -219,11 +224,6 @@ buildCoverageHTML = function (data) {
     additionalInsuranceSection = $("<section/>").
       addClass('additional-insurance-section').
       append('<p>Other insurance policies were found. Click below to see details</p>');
-  }
-
-  // Build plan maximums and deductibles
-  if (data['plan'] && data['plan']['financials']) {
-    coverageSection.append(buildPanelUI('Plan Maximums and Deductibles', buildMaximumDeductibles(data['plan']['financials'])));
   }
 
   // Build plan coverage
@@ -270,8 +270,8 @@ buildCoverageHTML = function (data) {
     additionalInsuranceSection.appendTo(subscriberSection);
 
     //Adding links to additional insurance information
-    $.each(data['plan']['additional_insurance_policies'], function(index, key) {
-      additionalInsuranceSection.append('<a href="#">link ' + (index + 1) +' </a><br/>');
+    $.each(data['plan']['additional_insurance_policies'], function(index, policy) {
+      additionalInsuranceSection.append('<a href="#insurance-' + index  + '">' + policy['insurance_type_label'] +' </a><br/>');
     });
   }
 
@@ -504,7 +504,7 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
   $("<th/>", {text: "Comments"}).appendTo(rowHead);
 
   $.each(additionalPolicies, function (index, policy) {
-    var row = $("<tr/>").appendTo(tableBody);
+    var row = $("<tr/>", {id: "insurance-" + index}).appendTo(tableBody);
 
     $("<td/>", {text: policy['insurance_type_label']}).appendTo(row);
     $("<td/>", {text: policy['coverage_description']}).appendTo(row);
@@ -1063,9 +1063,15 @@ parseContactDetails = function (contactDetails) {
   var list = new Array();
   $.each(contactDetails, function (index, details) {
     var detailsList = new Array();
-    detailsList.push(parseName(details));
-    if (details['address'] && details['address']['street_line_1']) {
+    if ((details['first_name'] && details['first_name'].length > 0) || (details['last_name'] && details['last_name'].length > 0)) {
+      detailsList.push(parseName(details));
+    }
+    if (details['address'] && details['address']['street_line_1'] && details['address']['street_line_1'].length > 0) {
       detailsList.push(parseAddress(details['address']));
+    }
+    console.log(details);
+    if (details['identification_type'] && details['identification_type'].length > 0) {
+      detailsList.push(details['identification_type'] + ': ' + details['identification_code']);
     }
     if (details['contacts'] && details['contacts'].length > 0) {
       detailsList.push(parseContacts(details['contacts']));
