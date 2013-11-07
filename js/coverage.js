@@ -1,5 +1,5 @@
 // Uncomment 1.3 coverage_url to see plan comments and physicians type until its deployed into production
-coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
+var coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
@@ -39,7 +39,10 @@ objectToUrlParameters = function (obj) {
 
 coverageRequest = function (params) {
   var options;
-  var parameters = objectToUrlParameters(params)
+  var parameters = objectToUrlParameters(params);
+  // Driving test cases to 1.1 until they are ready on 1.3
+  if (params['test'])
+    coverage_url = "https://gds.eligibleapi.com/v1.1/coverage/all.json"
   options = {
     data: parameters,
     headers: {
@@ -380,9 +383,9 @@ buildInsuranceSection1 = function(primaryInsurance, demographics) {
   }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
-  if (demographics['dependent'] && demographics['dependent']['member_id'].length > 0)
+  if (demographics['dependent'] && demographics['dependent']['member_id'] && demographics['dependent']['member_id'].length > 0)
     $("<td/>", {text: demographics['dependent']['member_id']}).appendTo(row);
-  else if (demographics['subscriber'])
+  else if (demographics['subscriber'] && demographics['subscriber']['member_id'] && demographics['subscriber']['member_id'].length > 0)
     $("<td/>", {text: demographics['subscriber']['member_id']}).appendTo(row);
   else
     $("<td/>", {text: ''}).appendTo(row);
