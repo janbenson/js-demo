@@ -227,9 +227,9 @@ buildCoverageHTML = function (data) {
   }
 
   // Build plan coverage
-  if (data['plan'] && data['plan']['financials']) {
-    coverageSection.append(buildPanelUI('Health Benefit Plan Coverage', buildFinancials(data['plan']['financials'])));
-  }
+//  if (data['plan'] && data['plan']['financials']) {
+//    coverageSection.append(buildPanelUI('Health Benefit Plan Coverage', buildFinancials(data['plan']['financials'])));
+//  }
 
   // Adding Service details
   if (data['services'] && data['services'].length > 0) {
@@ -240,10 +240,10 @@ buildCoverageHTML = function (data) {
         if (div.children().length == 2) {
           div = $("<div/>").addClass("clearfix").addClass("services-div").appendTo(coverageSection);
         }
-        if (service['financials']) {
+        if (service['financials'] && service['financials']['coinsurance']) {
           div.append(buildPanelUI(service['type_label'], buildFinancials(service['financials'])));
         }
-        if (service['facility']) {
+        if (service['facility'] && service['facility']['coinsurance']) {
           div.append(buildPanelUI(service['type_label'], buildFinancials(service['facility'])));
         }
       }
@@ -974,7 +974,7 @@ buildFinancialRow = function (network, level, type, period, item) {
 
   $("<td/>", {text: type}).appendTo(row);
   if (item['amount'] && item['amount'].length > 0)
-    $("<td/>", {text: "$ " + item['amount'] + ".00"}).appendTo(row);
+    $("<td/>", {text: parseAmount(item['amount'])} ).appendTo(row);
   else if (item['percent'] && item['percent'].length > 0)
     $("<td/>", {text: "% " + item['percent']}).appendTo(row);
   $("<td/>", {text: period}).appendTo(row);
