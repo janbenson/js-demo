@@ -934,6 +934,22 @@ buildMaximumDeductibles = function (data) {
     }
   });
 
+  var sortByContent = function(a, b) {
+    var count_a = 0;
+    var count_b = 0;
+    for (var i = 2; i < 10; i++) {
+      if (a[i].text() != "")
+        count_a +=1;
+      if (b[i].text() != "")
+        count_b +=1;
+    }
+    if (count_a < count_b) return 1;
+    if (count_a > count_b) return -1;
+    if (a[0].text() == "IN") return -1;
+    return 0;
+  }
+  rows.sort(sortByContent);
+
   $.each(rows, function(idx, row) {
     tableBody.append($("<tr/>", {html: row}));
   });
