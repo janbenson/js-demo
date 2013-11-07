@@ -502,7 +502,13 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
   $.each(additionalPolicies, function (index, policy) {
     var row = $("<tr/>", {id: "insurance-" + index}).appendTo(tableBody);
 
-    $("<td/>", {text: policy['insurance_type_label']}).appendTo(row);
+    var insurance_types = new Array();
+    if (policy['payer_type_label'].length > 0)
+      insurance_types.push(policy['payer_type_label']);
+    if (policy['insurance_type_label'].length > 0)
+      insurance_types.push(policy['insurance_type_label']);
+
+    $("<td/>", {text: insurance_types.join(" - ")}).appendTo(row);
     $("<td/>", {text: policy['coverage_description']}).appendTo(row);
     $("<td/>", {html: parseReference(policy['reference']).join("<br/>")}).appendTo(row);
     $("<td/>", {html: parseContactDetails(policy['contact_details']).join("<br/>")}).appendTo(row);
