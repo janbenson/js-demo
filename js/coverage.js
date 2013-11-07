@@ -373,10 +373,12 @@ buildInsuranceSection1 = function(primaryInsurance, demographics) {
   $("<td/>", {text: primaryInsurance['payer_type_label']}).appendTo(row); // v1.3
 
   $("<th/>", {text: "Member Type"}).appendTo(rowHead);
-  if (demographics['dependent']) {
+  if (demographics['dependent'] && demographics['dependent']['first_name']) {
     $("<td/>", {text: "Dependent"}).appendTo(row);
-  } else {
+  } else if (demographics['subscriber'] && demographics['subscriber']['first_name']) {
     $("<td/>", {text: "Subscriber"}).appendTo(row);
+  } else {
+    $("<td/>", {text: ""}).appendTo(row);
   }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
@@ -1063,7 +1065,6 @@ parseContactDetails = function (contactDetails) {
     if (details['address'] && details['address']['street_line_1'] && details['address']['street_line_1'].length > 0) {
       detailsList.push(parseAddress(details['address']));
     }
-    console.log(details);
     if (details['identification_type'] && details['identification_type'].length > 0) {
       detailsList.push(details['identification_type'] + ': ' + details['identification_code']);
     }
