@@ -578,8 +578,9 @@ buildMaximumDeductibles = function (data) {
             col_index = 6;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
+            console.log("MIRA: " + row);
           } else {
             row = new Array();
             for (var i = 1; i < 10; i++) {
@@ -624,7 +625,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 7;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -671,7 +672,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 6;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -717,7 +718,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 7;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -766,7 +767,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 8;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -812,7 +813,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 9;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -859,7 +860,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 8;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -905,7 +906,7 @@ buildMaximumDeductibles = function (data) {
             col_index = 9;
 
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
-          if (row_idx) {
+          if (row_idx != null) {
             row = rows[row_idx];
           } else {
             row = new Array();
@@ -934,15 +935,15 @@ buildMaximumDeductibles = function (data) {
 }
 
 findMaximumMinimumRowIdx = function(rows, network, additional_information, col_index) {
+  var ret = null;
   $.each(rows, function(row_idx, row) {
-    console.log("MIRA: " + cmpArrays(row[1], additional_information));
-    if (cmpArrays(row[1], additional_information) && row[0] == network) {
+    if (row[1].html() == additional_information.join("<br/>") && row[0].text() == network) {
       if (row[col_index].text() == "") {
-        return(row_idx);
+        ret = row_idx;
       }
     }
   });
-  return(null);
+  return(ret);
 }
 
 buildFinancials = function (data) {
