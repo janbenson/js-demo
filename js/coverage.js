@@ -1,6 +1,5 @@
 // Uncomment 1.3 coverage_url to see plan comments and physicians type until its deployed into production
-coverage_url = "https://gds.eligibleapi.com/v1.1/coverage/all.json"
-//coverage_url = "https://staginggds.eligibleapi.com/v1.3/coverage/all.json"
+coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
