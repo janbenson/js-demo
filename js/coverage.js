@@ -387,9 +387,6 @@ buildInsuranceSection1 = function(primaryInsurance, demographics) {
   else
     $("<td/>", {text: ''}).appendTo(row);
 
-  $("<th/>", {text: "Contacts"}).appendTo(rowHead);
-  $("<td/>", {html: parseContacts(primaryInsurance['contacts']).join("<br/>")}).appendTo(row);
-
   return(table);
 }
 
