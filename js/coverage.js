@@ -253,12 +253,10 @@ buildCoverageHTML = function (data) {
 
   var body = $('body');
   var subscriberSection = $("<section/>").addClass('subscriber-section');
-  var coverageStatusSection = $("<section/>").addClass('coverage-status-section').append('<h1>Coverage Status</h1><p class="coverage-status"></p>');
 
   coverageSection.appendTo(body);
   subscriberSection.prependTo(coverageSection);
   insuranceSection.insertAfter(subscriberSection);
-  coverageStatusSection.insertAfter(insuranceSection);
 
   // Adding classes for styling
 
@@ -276,7 +274,6 @@ buildCoverageHTML = function (data) {
   }
 
   $('.plan').appendTo(insuranceSection);
-  coverageStatusSection.find('.coverage-status').text($('.coverage-status-text').text());
 };
 
 buildPanelUI = function (title, content) {
