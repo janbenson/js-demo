@@ -55,7 +55,7 @@ coverageRequest = function (params) {
     success: function (data, textStatus, jqXHR) {
       console.log("GET Ajax Call SUCCESS URL:" + coverage_url + "?" + parameters + ", Status :" + textStatus)
       try {
-        successCallback($.parseJSON(data));
+        var jsonData = $.parseJSON(data);
       } catch(err) {
         console.log(err);
         if (data.indexOf("NPI")) {
@@ -64,6 +64,8 @@ coverageRequest = function (params) {
           alert(data);
         }
       }
+      if (jsonData)
+        successCallback(jsonData);
     },
     error: function (xhr, textStatus, errorThrown) {
       console.log("GET Ajax Call FAILURE URL:" + coverage_url + "?" + parameters + ", Status :", textStatus, ", Error: ", errorThrown)
@@ -503,9 +505,9 @@ buildAdditionalInsurancePolicies = function (additionalPolicies) {
     var row = $("<tr/>", {id: "insurance-" + index}).appendTo(tableBody);
 
     var insurance_types = new Array();
-    if (policy['payer_type_label'].length > 0)
+    if (policy['payer_type_label'] && policy['payer_type_label'].length > 0)
       insurance_types.push(policy['payer_type_label']);
-    if (policy['insurance_type_label'].length > 0)
+    if (policy['insurance_type_label'] && policy['insurance_type_label'].length > 0)
       insurance_types.push(policy['insurance_type_label']);
 
     $("<td/>", {text: insurance_types.join(" - ")}).appendTo(row);
@@ -542,17 +544,7 @@ buildMaximumDeductibles = function (data) {
   $("<th/>", {text: "Maximum"}).appendTo(rowHead2);
   $("<th/>", {text: "Maximum Remaining"}).addClass("right-grey-border").appendTo(rowHead2);
 
-  row1 = new Array(10);
-  row1[0] = $("<td/>", {text: "IN"});
-  for (var i = 1; i < 10; i++) {
-    row1[i] = $("<td/>", {text: ""});
-  }
-  row2 = new Array(10);
-  row2[0] = $("<td/>", {text: "OUT"});
-  for (var i = 1; i < 10; i++) {
-    row2[i] = $("<td/>", {text: ""});
-  }
-
+  var rows = new Array();
 
   $.each(data, function (key) {
     item = data[key];
@@ -562,64 +554,92 @@ buildMaximumDeductibles = function (data) {
       if (item['totals'] && item['totals']['in_network'] && item['totals']['in_network'].length > 0) {
         $.each(item['totals']['in_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row1[2] = $("<td/>", {text: amount});
-          } else {
-            row1[6] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 2;
+          else
+            col_index = 6;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "IN"});
+            rows.push(row);
           }
 
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+          }
         });
       }
       // In Network Deductible Remaining
       if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['in_network'].length > 0) {
         $.each(item['remainings']['in_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row1[3] = $("<td/>", {text: amount});
-          } else {
-            row1[7] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 3;
+          else
+            col_index = 7;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "IN"});
+            rows.push(row);
           }
 
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+          }
         });
       }
 
@@ -627,64 +647,92 @@ buildMaximumDeductibles = function (data) {
       if (item['totals'] && item['totals']['out_network'] && item['totals']['out_network'].length > 0) {
         $.each(item['totals']['out_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row2[2] = $("<td/>", {text: amount});
-          } else {
-            row2[6] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 2;
+          else
+            col_index = 6;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "OUT"});
+            rows.push(row);
           }
 
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+          }
         });
       }
       // Out Network Deductible Remaining
       if (item['remainings'] && item['remainings']['out_network'] && item['remainings']['out_network'].length > 0) {
         $.each(item['remainings']['out_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row2[3] = $("<td/>", {text: amount});
-          } else {
-            row2[7] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 3;
+          else
+            col_index = 7;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "OUT"});
+            rows.push(row);
           }
 
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
+          }
         });
       }
     }
@@ -694,30 +742,45 @@ buildMaximumDeductibles = function (data) {
       if (item['totals'] && item['totals']['in_network'] && item['totals']['in_network'].length > 0) {
         $.each(item['totals']['in_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row1[4] = $("<td/>", {text: amount});
-          } else {
-            row1[8] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 4;
+          else
+            col_index = 8;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "IN"});
+            rows.push(row);
+          }
+
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
           }
         });
       }
@@ -725,30 +788,45 @@ buildMaximumDeductibles = function (data) {
       if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['in_network'].length > 0) {
         $.each(item['remainings']['in_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row1[5] = $("<td/>", {text: amount});
-          } else {
-            row1[9] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row1[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 5;
+          else
+            col_index = 9;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "IN"});
+            rows.push(row);
+          }
+
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
           }
         });
       }
@@ -757,30 +835,45 @@ buildMaximumDeductibles = function (data) {
       if (item['totals'] && item['totals']['out_network'] && item['totals']['out_network'].length > 0) {
         $.each(item['totals']['out_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row2[4] = $("<td/>", {text: amount});
-          } else {
-            row2[8] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 4;
+          else
+            col_index = 8;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "OUT"});
+            rows.push(row);
+          }
+
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
           }
         });
       }
@@ -788,52 +881,68 @@ buildMaximumDeductibles = function (data) {
       if (item['remainings'] && item['remainings']['in_network'] && item['remainings']['out_network'].length > 0) {
         $.each(item['remainings']['out_network'], function (idx, info) {
           var level = info['level'];
-          var amount = null;
 
+          var amount = null;
           if (info['amount'] && info['amount'].length > 0)
             amount = parseAmount(info['amount']);
           else if (info['percent'] && info['percent'].length > 0)
             amount = "% " + info['percent'];
 
-          if (level == 'INDIVIDUAL') {
-            row2[5] = $("<td/>", {text: amount});
-          } else {
-            row2[9] = $("<td/>", {text: amount});
-          }
-
-          var extra_info = new Array();
+          var additional_information = new Array();
           if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
-            extra_info.push(info['insurance_type_label']);
+            additional_information.push(info['insurance_type_label']);
           }
           if (info['comments'] && info['comments'].length > 0) {
             $.each(info['comments'], function (idx, value) {
-              extra_info.push(value);
+              additional_information.push(value);
             });
           }
-          if (extra_info.length > 0) {
-            row2[1] = $("<td/>", {html: extra_info.join("<br/>")});
+
+          var col_index = null;
+          if (level == 'INDIVIDUAL')
+            col_index = 5;
+          else
+            col_index = 9;
+
+          var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
+          if (row_idx) {
+            row = rows[row_idx];
+          } else {
+            row = new Array();
+            for (var i = 1; i < 10; i++) {
+              row[i] = $("<td/>", {text: ""});
+            }
+            row[0] = $("<td/>", {text: "OUT"});
+            rows.push(row);
+          }
+
+          row[col_index] = $("<td/>", {text: amount});
+
+          if ((additional_information.length > 0) && (row[1].text() == "")) {
+            row[1] = $("<td/>", {html: additional_information.join("<br/>")});
           }
         });
       }
     }
   });
 
-  var add_row = false;
-  for (var i = 2; i < 10; i++) {
-    if ($(row1[i]).text().length > 0)
-      add_row = true;
-  }
-  if (add_row)
-    tableBody.append($("<tr/>", {html: row1}));
-
-  add_row = false
-  for (var i = 2; i < 10; i++)
-    if ($(row2[i]).text().length > 0)
-      add_row = true;
-  if (add_row)
-    tableBody.append($("<tr/>", {html: row2}));
+  $.each(rows, function(idx, row) {
+    tableBody.append($("<tr/>", {html: row}));
+  });
 
   return(table);
+}
+
+findMaximumMinimumRowIdx = function(rows, network, additional_information, col_index) {
+  $.each(rows, function(row_idx, row) {
+    console.log("MIRA: " + cmpArrays(row[1], additional_information));
+    if (cmpArrays(row[1], additional_information) && row[0] == network) {
+      if (row[col_index].text() == "") {
+        return(row_idx);
+      }
+    }
+  });
+  return(null);
 }
 
 buildFinancials = function (data) {
@@ -1149,3 +1258,19 @@ coverageStatus = function (data) {
 
   return status;
 };
+
+cmpArrays = function (arrA, arrB) {
+  //check if lengths are different
+  if (arrA.length !== arrB.length) return false;
+
+  //slice so we do not effect the orginal
+  //sort makes sure they are in order
+  var cA = arrA.slice().sort();
+  var cB = arrB.slice().sort();
+
+  for (var i = 0; i < cA.length; i++) {
+    if (cA[i] !== cB[i]) return false;
+  }
+
+  return true;
+}
