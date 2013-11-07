@@ -55,7 +55,7 @@ coverageRequest = function (params) {
       try {
         successCallback($.parseJSON(data));
       } catch(err) {
-        console.log(data);
+        console.log(err);
         if (data.indexOf("NPI")) {
           alert("You should enroll your NPI though our website");
         } else {
@@ -313,6 +313,20 @@ buildDemographics = function (person) {
   return(table);
 }
 
+parseSubscriberInfo = function(subscriber) {
+  var data = new Array();
+  if (subscriber['member_id'].length > 0)
+    data.push("Member ID: " + subscriber['member_id']);
+  if (subscriber['dob'].length > 0)
+    data.push("DOB: " + subscriber['dob']);
+  if (subscriber['group_id'].length > 0)
+    data.push("Group ID: " + subscriber['group_id']);
+  if (subscriber['group_name'].length > 0)
+    data.push("Group Name: " + subscriber['group_name']);
+  data = data.concat(parseNameAndAddress(subscriber));
+  return(data);
+}
+
 parseNameAndAddress = function (person) {
   var result = new Array();
 
@@ -367,7 +381,9 @@ buildInsuranceSection1 = function(primaryInsurance, demographics) {
   }
 
   $("<th/>", {text: "ID"}).appendTo(rowHead);
-  if (demographics['subscriber'])
+  if (demographics['dependent'] && demographics['dependent']['member_id'].length > 0)
+    $("<td/>", {text: demographics['dependent']['member_id']}).appendTo(row);
+  else if (demographics['subscriber'])
     $("<td/>", {text: demographics['subscriber']['member_id']}).appendTo(row);
   else
     $("<td/>", {text: ''}).appendTo(row);
@@ -438,7 +454,7 @@ buildInsuranceSection3 = function(plan, subscriber) {
   $("<td/>", {html: dates.join("<br/>")}).appendTo(row);
 
   $("<th/>", {text: "Subscriber Info"}).appendTo(rowHead);
-  $("<td/>", {html: parseNameAndAddress(subscriber).join("<br/>")}).appendTo(row);
+  $("<td/>", {html: parseSubscriberInfo(subscriber).join("<br/>")}).appendTo(row);
 
   return(table);
 }
