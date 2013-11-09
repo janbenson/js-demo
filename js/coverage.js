@@ -249,6 +249,11 @@ buildCoverageHTML = function (data) {
       append('<p>Other insurance policies were found. Click below to see details</p>');
   }
 
+  // Build disclaimer
+  if (data['plan'] && data['plan']['financials'] && data['plan']['financials']['disclaimer'] && data['plan']['financials']['disclaimer'].length > 0) {
+    coverageSection.append(buildPanelUI('Disclaimer', buildDisclaimer(data['plan']['financials']['disclaimer'])));
+  }
+
   // Build plan coverage
 //  if (data['plan'] && data['plan']['financials']) {
 //    coverageSection.append(buildPanelUI('Health Benefit Plan Coverage', buildFinancials(data['plan']['financials'])));
@@ -1014,6 +1019,24 @@ findFinancialRowIdx = function (rows, network, additional_information, col_index
   });
   return(ret);
 }
+
+buildDisclaimer = function (data) {
+  var table = $("<table class=\"table table-hover\"/>");
+//  var tableHead = $("<thead></thead>").appendTo(table);
+//  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var row = $("<tr/>").appendTo(tableBody);
+
+  var disclaimer = new Array();
+  $.each(data, function(idx, item) {
+    disclaimer.push(item);
+  });
+
+//  $("<th/>", {text: "Disclaimer"}).appendTo(rowHead);
+  $("<td/>", {html: disclaimer.join("<br>")}).appendTo(row);
+
+  return(table);
+};
 
 
 buildFinancials = function (data) {
