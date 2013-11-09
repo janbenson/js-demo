@@ -197,6 +197,10 @@ buildCoverageHTML = function (data) {
 
   var insuranceSection = $("<section/>").addClass("insurance-section");
 
+  // For tests we use primary_insurance, for prod we use insurance
+  if (data['insurance'] && data['insurance']['name']) {
+    buildPanelUI('Insurance', buildInsuranceSection1(data['insurance'], data['demographics'])).appendTo(insuranceSection);
+  }
   if (data['primary_insurance'] && data['primary_insurance']['name']) {
     buildPanelUI('Insurance', buildInsuranceSection1(data['primary_insurance'], data['demographics'])).appendTo(insuranceSection);
   }
@@ -207,10 +211,14 @@ buildCoverageHTML = function (data) {
     if (data['demographics'] && data['demographics']['subscriber']) {
       buildPanelUI('Plan', buildInsuranceSection3(data['plan'], data['demographics']['subscriber'])).appendTo(insuranceSection);
     }
-
+    
+    // For tests we use primary_insurance, for prod we use insurance
+    if (data['insurance'] && data['insurance']['service_providers'] && data['insurance']['service_providers']['physicians'] && data['insurance']['service_providers']['physicians'].length > 0) {
+      buildPanelUI('Plan', buildInsuranceSection4(data['insurance']['service_providers'])).appendTo(insuranceSection);
+    }
     if (data['primary_insurance'] && data['primary_insurance']['service_providers'] && data['primary_insurance']['service_providers']['physicians'] && data['primary_insurance']['service_providers']['physicians'].length > 0) {
       buildPanelUI('Plan', buildInsuranceSection4(data['primary_insurance']['service_providers'])).appendTo(insuranceSection);
-    }
+    }    
   }
 
   // Build plan maximums and deductibles
