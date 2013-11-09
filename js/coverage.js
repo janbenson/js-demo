@@ -55,7 +55,7 @@ coverageRequest = function (params) {
       console.log("GET Ajax Call SUCCESS URL:" + coverage_url + "?" + parameters + ", Status :" + textStatus)
       try {
         var jsonData = $.parseJSON(data);
-      } catch(err) {
+      } catch (err) {
         console.log(err);
         if (data.indexOf("NPI")) {
           alert("You should enroll your NPI though our website");
@@ -218,6 +218,20 @@ buildCoverageHTML = function (data) {
     coverageSection.append(buildPanelUI('Plan Maximums and Deductibles', buildMaximumDeductibles(data['plan']['financials'])));
   }
 
+  // Build plan coinsurance
+  if (data['plan'] && data['plan']['financials'] && data['plan']['financials']['coinsurance'] &&
+    (data['plan']['financials']['coinsurance']['percents']['in_network'].length > 0 ||
+      data['plan']['financials']['coinsurance']['percents']['out_network'].length > 0)) {
+    coverageSection.append(buildPanelUI('Plan Coinsurance', buildCoinsurance(data['plan']['financials']['coinsurance'])));
+  }
+
+  // Build plan copayment
+  if (data['plan'] && data['plan']['financials'] && data['plan']['financials']['copayment'] &&
+    (data['plan']['financials']['copayment']['amounts']['in_network'].length > 0 ||
+      data['plan']['financials']['copayment']['amounts']['out_network'].length > 0)) {
+    coverageSection.append(buildPanelUI('Plan Copayment', buildCopayment(data['plan']['financials']['copayment'])));
+  }
+
   // Build additional insurance policies
   if (data['plan'] && data['plan']['additional_insurance_policies'] && data['plan']['additional_insurance_policies'].length > 0) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
@@ -269,8 +283,8 @@ buildCoverageHTML = function (data) {
     additionalInsuranceSection.appendTo(subscriberSection);
 
     //Adding links to additional insurance information
-    $.each(data['plan']['additional_insurance_policies'], function(index, policy) {
-      additionalInsuranceSection.append('<a href="#insurance-' + index  + '">' + policy['insurance_type_label'] +' </a><br/>');
+    $.each(data['plan']['additional_insurance_policies'], function (index, policy) {
+      additionalInsuranceSection.append('<a href="#insurance-' + index + '">' + policy['insurance_type_label'] + ' </a><br/>');
     });
   }
 
@@ -313,7 +327,7 @@ buildDemographics = function (person) {
   return(table);
 }
 
-parseSubscriberInfo = function(subscriber) {
+parseSubscriberInfo = function (subscriber) {
   var data = new Array();
   if (subscriber['member_id'].length > 0)
     data.push("Member ID: " + subscriber['member_id']);
@@ -360,7 +374,7 @@ parsePersonAdditionalInfo = function (person) {
   return additionalInformation;
 }
 
-buildInsuranceSection1 = function(primaryInsurance, demographics) {
+buildInsuranceSection1 = function (primaryInsurance, demographics) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -393,7 +407,7 @@ buildInsuranceSection1 = function(primaryInsurance, demographics) {
   return(table);
 }
 
-buildInsuranceSection2 = function(plan) {
+buildInsuranceSection2 = function (plan) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -418,7 +432,7 @@ buildInsuranceSection2 = function(plan) {
   return(table);
 }
 
-buildInsuranceSection3 = function(plan, subscriber) {
+buildInsuranceSection3 = function (plan, subscriber) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -458,7 +472,7 @@ buildInsuranceSection3 = function(plan, subscriber) {
   return(table);
 }
 
-buildInsuranceSection4 = function(service_providers) {
+buildInsuranceSection4 = function (service_providers) {
   var table = $("<table class=\"table table-hover\"/>");
   var tableHead = $("<thead></thead>").appendTo(table);
   var rowHead = $("<tr></tr>").appendTo(tableHead);
@@ -470,7 +484,7 @@ buildInsuranceSection4 = function(service_providers) {
   $("<th/>", {text: "Contacts"}).appendTo(rowHead);
   $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
 
-  $.each(service_providers['physicians'], function(idx, item) {
+  $.each(service_providers['physicians'], function (idx, item) {
     var row = $("<tr></tr>");
 
     var contact = item['contact_details'][0];
@@ -488,7 +502,7 @@ buildInsuranceSection4 = function(service_providers) {
   });
 
   if ($(tableBody).children().length > 0) {
-   return(table);
+    return(table);
   } else {
     return(null);
   }
@@ -563,16 +577,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 2, 6);
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("IN");
+            row = buildMaximumDeductiblesEmptyRow("IN", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 2, 6);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -585,16 +599,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 3, 7);
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("IN");
+            row = buildMaximumDeductiblesEmptyRow("IN", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 3, 7);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -608,16 +622,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 2, 6);
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("OUT");
+            row = buildMaximumDeductiblesEmptyRow("OUT", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 2, 6);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -630,16 +644,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 3, 7);
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("OUT");
+            row = buildMaximumDeductiblesEmptyRow("OUT", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 3, 7);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -655,16 +669,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 4, 8);
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("IN");
+            row = buildMaximumDeductiblesEmptyRow("IN", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 4, 8);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -677,16 +691,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 5, 9);
           var row_idx = findMaximumMinimumRowIdx(rows, 'IN', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("IN");
+            row = buildMaximumDeductiblesEmptyRow("IN", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 5, 9);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -700,16 +714,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 4, 8);
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("OUT");
+            row = buildMaximumDeductiblesEmptyRow("OUT", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 4, 8);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -722,16 +736,16 @@ buildMaximumDeductibles = function (data) {
           var amount = parsePlanAmount(info);
           var additional_information = parsePlanAdditionalInfo(info);
 
+          var col_index = getPlanColIndex(level, 5, 9);
           var row_idx = findMaximumMinimumRowIdx(rows, 'OUT', additional_information, col_index);
           var row = null;
           if (row_idx != null) {
             row = rows[row_idx];
           } else {
-            row = buildMaximumDeductiblesEmptyRow("OUT");
+            row = buildMaximumDeductiblesEmptyRow("OUT", 10);
             rows.push(row);
           }
 
-          var col_index = getPlanColIndex(level, 5, 9);
           row[col_index] = $("<td/>", {text: amount});
 
           addAdditionalInfoToMaxDeductibleRow(row, additional_information);
@@ -740,14 +754,14 @@ buildMaximumDeductibles = function (data) {
     }
   });
 
-  var sortByContent = function(a, b) {
+  var sortByContent = function (a, b) {
     var count_a = 0;
     var count_b = 0;
     for (var i = 2; i < 10; i++) {
       if (a[i].text() != "")
-        count_a +=1;
+        count_a += 1;
       if (b[i].text() != "")
-        count_b +=1;
+        count_b += 1;
     }
     if (count_a < count_b) return 1;
     if (count_a > count_b) return -1;
@@ -756,29 +770,29 @@ buildMaximumDeductibles = function (data) {
   }
   rows.sort(sortByContent);
 
-  $.each(rows, function(idx, row) {
+  $.each(rows, function (idx, row) {
     tableBody.append($("<tr/>", {html: row}));
   });
 
   return(table);
 }
 
-buildMaximumDeductiblesEmptyRow = function(network) {
+buildMaximumDeductiblesEmptyRow = function (network, cols) {
   var row = new Array();
-  for (var i = 1; i < 10; i++) {
+  for (var i = 1; i < cols; i++) {
     row[i] = $("<td/>", {text: ""});
   }
   row[0] = $("<td/>", {text: network});
   return(row);
 }
 
-addAdditionalInfoToMaxDeductibleRow = function(row, additional_information) {
+addAdditionalInfoToMaxDeductibleRow = function (row, additional_information) {
   if ((additional_information.length > 0) && (row[1].text() == "")) {
     row[1] = $("<td/>", {html: additional_information.join("<br>")});
   }
 }
 
-parsePlanAmount = function(info) {
+parsePlanAmount = function (info) {
   var amount = null;
   if (info['amount'] && info['amount'].length > 0)
     amount = parseAmount(info['amount']);
@@ -787,7 +801,7 @@ parsePlanAmount = function(info) {
   return amount;
 }
 
-parsePlanAdditionalInfo = function(info) {
+parsePlanAdditionalInfo = function (info) {
   var additional_information = new Array();
   if (info['insurance_type_label'] && info['insurance_type_label'].length > 0) {
     additional_information.push(info['insurance_type_label']);
@@ -800,7 +814,7 @@ parsePlanAdditionalInfo = function(info) {
   return(additional_information.sort());
 }
 
-getPlanColIndex = function(level, individual_idx, family_idx) {
+getPlanColIndex = function (level, individual_idx, family_idx) {
   var col_index = null;
   if (level == 'INDIVIDUAL')
     col_index = individual_idx;
@@ -809,9 +823,9 @@ getPlanColIndex = function(level, individual_idx, family_idx) {
   return(col_index);
 }
 
-findMaximumMinimumRowIdx = function(rows, network, additional_information, col_index) {
+findMaximumMinimumRowIdx = function (rows, network, additional_information, col_index) {
   var ret = null;
-  $.each(rows, function(row_idx, row) {
+  $.each(rows, function (row_idx, row) {
     if (row[1].html() == additional_information.join("<br>") && row[0].text() == network) {
       if (row[col_index].text() == "") {
         ret = row_idx;
@@ -820,6 +834,179 @@ findMaximumMinimumRowIdx = function(rows, network, additional_information, col_i
   });
   return(ret);
 }
+
+buildCoinsurance = function (data) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var rowHead2 = $("<tr class='warning'></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var rows = null;
+
+  $("<th/>", {colSpan: 2, text: ""}).appendTo(rowHead);
+  $("<th/>", {colSpan: 2, text: "Individual"}).addClass("text-center right-grey-border left-grey-border").appendTo(rowHead);
+  $("<th/>", {colSpan: 2, text: "Family"}).addClass("text-center right-grey-border").appendTo(rowHead);
+
+  $("<th/>", {text: "Network"}).appendTo(rowHead2);
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead2);
+  $("<th/>", {text: "Period"}).addClass("left-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Amount"}).addClass("right-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Period"}).appendTo(rowHead2);
+  $("<th/>", {text: "Amount"}).addClass("right-grey-border").appendTo(rowHead2);
+
+  var rows = new Array();
+
+  $.each(data['percents'], function (key) {
+    item = data['percents'][key];
+
+    var text_network = '';
+    if (key == 'in_network')
+      text_network = 'IN';
+    if (key == 'out_network')
+      text_network = 'OUT';
+
+    $.each(item, function (idx, info) {
+      var level = info['level'];
+      var amount = parsePlanAmount(info);
+      var additional_information = parsePlanAdditionalInfo(info);
+      var period = info['time_period_label'];
+      var col_index = null;
+      if (level == "INDIVIDUAL")
+        col_index = 2;
+      else
+        col_index = 4;
+
+      var row_idx = findFinancialRowIdx(rows, text_network, additional_information, col_index);
+      var row = null;
+      if (row_idx != null) {
+        row = rows[row_idx];
+      } else {
+        row = buildMaximumDeductiblesEmptyRow(text_network, 6);
+        rows.push(row);
+      }
+
+      row[col_index] = $("<td/>", {text: period});
+      row[col_index + 1] = $("<td/>", {text: amount});
+
+      addAdditionalInfoToMaxDeductibleRow(row, additional_information);
+    });
+  });
+
+  var sortByContent = function (a, b) {
+    var count_a = 0;
+    var count_b = 0;
+    for (var i = 2; i < 6; i++) {
+      if (a[i].text() != "")
+        count_a += 1;
+      if (b[i].text() != "")
+        count_b += 1;
+    }
+    if (count_a < count_b) return 1;
+    if (count_a > count_b) return -1;
+    if (a[0].text() == "IN") return -1;
+    return 0;
+  }
+  rows.sort(sortByContent);
+
+  $.each(rows, function (idx, row) {
+    tableBody.append($("<tr/>", {html: row}));
+  });
+
+  return(table);
+}
+
+buildCopayment = function (data) {
+  var table = $("<table class=\"table table-hover\"/>");
+  var tableHead = $("<thead></thead>").appendTo(table);
+  var rowHead = $("<tr></tr>").appendTo(tableHead);
+  var rowHead2 = $("<tr class='warning'></tr>").appendTo(tableHead);
+  var tableBody = $("<tbody/>").appendTo(table);
+  var rows = null;
+
+  $("<th/>", {colSpan: 2, text: ""}).appendTo(rowHead);
+  $("<th/>", {colSpan: 2, text: "Individual"}).addClass("text-center right-grey-border left-grey-border").appendTo(rowHead);
+  $("<th/>", {colSpan: 2, text: "Family"}).addClass("text-center right-grey-border").appendTo(rowHead);
+
+  $("<th/>", {text: "Network"}).appendTo(rowHead2);
+  $("<th/>", {text: "Additional Information"}).appendTo(rowHead2);
+  $("<th/>", {text: "Period"}).addClass("left-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Amount"}).addClass("right-grey-border").appendTo(rowHead2);
+  $("<th/>", {text: "Period"}).appendTo(rowHead2);
+  $("<th/>", {text: "Amount"}).addClass("right-grey-border").appendTo(rowHead2);
+
+  var rows = new Array();
+
+  $.each(data['amounts'], function (key) {
+    item = data['amounts'][key];
+
+    var text_network = '';
+    if (key == 'in_network')
+      text_network = 'IN';
+    if (key == 'out_network')
+      text_network = 'OUT';
+
+    $.each(item, function (idx, info) {
+      var level = info['level'];
+      var amount = parsePlanAmount(info);
+      var additional_information = parsePlanAdditionalInfo(info);
+      var period = info['time_period_label'];
+      var col_index = null;
+      if (level == "INDIVIDUAL")
+        col_index = 2;
+      else
+        col_index = 4;
+
+      var row_idx = findFinancialRowIdx(rows, text_network, additional_information, col_index);
+      var row = null;
+      if (row_idx != null) {
+        row = rows[row_idx];
+      } else {
+        row = buildMaximumDeductiblesEmptyRow(text_network, 6);
+        rows.push(row);
+      }
+
+      row[col_index] = $("<td/>", {text: period});
+      row[col_index + 1] = $("<td/>", {text: amount});
+
+      addAdditionalInfoToMaxDeductibleRow(row, additional_information);
+    });
+  });
+
+  var sortByContent = function (a, b) {
+    var count_a = 0;
+    var count_b = 0;
+    for (var i = 2; i < 6; i++) {
+      if (a[i].text() != "")
+        count_a += 1;
+      if (b[i].text() != "")
+        count_b += 1;
+    }
+    if (count_a < count_b) return 1;
+    if (count_a > count_b) return -1;
+    if (a[0].text() == "IN") return -1;
+    return 0;
+  }
+  rows.sort(sortByContent);
+
+  $.each(rows, function (idx, row) {
+    tableBody.append($("<tr/>", {html: row}));
+  });
+
+  return(table);
+}
+
+findFinancialRowIdx = function (rows, network, additional_information, col_index) {
+  var ret = null;
+  $.each(rows, function (row_idx, row) {
+    if (row[1].html() == additional_information.join("<br>") && row[0].text() == network) {
+      if (row[col_index].text() == "") {
+        ret = row_idx;
+      }
+    }
+  });
+  return(ret);
+}
+
 
 buildFinancials = function (data) {
   var table = $("<table class=\"table table-hover\"/>");
@@ -953,15 +1140,15 @@ buildFinancialRow = function (network, level, type, period, item) {
   $("<td/>").appendTo(row);
   $("<td/>").appendTo(row);
 
- // if (network == 'in_network')
- //   $("<td/>", {text: 'In'}).appendTo(row);
- // else
- //   $("<td/>", {text: 'Out'}).appendTo(row);
- // $("<td/>", {text: level}).appendTo(row);
+  // if (network == 'in_network')
+  //   $("<td/>", {text: 'In'}).appendTo(row);
+  // else
+  //   $("<td/>", {text: 'Out'}).appendTo(row);
+  // $("<td/>", {text: level}).appendTo(row);
 
   $("<td/>", {text: type}).appendTo(row);
   if (item['amount'] && item['amount'].length > 0)
-    $("<td/>", {text: parseAmount(item['amount'])} ).appendTo(row);
+    $("<td/>", {text: parseAmount(item['amount'])}).appendTo(row);
   else if (item['percent'] && item['percent'].length > 0)
     $("<td/>", {text: "% " + item['percent']}).appendTo(row);
   $("<td/>", {text: period}).appendTo(row);

@@ -99,38 +99,38 @@
 	clear: both;
 }
 
-.plan-maximums-and-deductibles h4 {
+.plan-maximums-and-deductibles h4, .plan-deductible h4, .plan-coinsurance h4 {
 	font-weight: bold;
 	font-size: 20px
 }
 
-.plan-maximums-and-deductibles .panel-heading {
+.plan-maximums-and-deductibles .panel-heading, .plan-deductible .panel-heading, .plan-coinsurance .panel-heading {
 	margin-bottom: -60px;
 }
 
-.plan-maximums-and-deductibles thead tr:first-child {
+.plan-maximums-and-deductibles thead tr:first-child, .plan-deductible thead tr:first-child, .plan-coinsurance thead tr:first-child  {
 	font-size: 20px;
 }
 
-.plan-maximums-and-deductibles thead {
+.plan-maximums-and-deductibles thead, .plan-deductible thead, .plan-coinsurance thead {
 	border-width: 0;
 }
 
-.plan-maximums-and-deductibles .table tr:first-child th {
+.plan-maximums-and-deductibles .table tr:first-child th, .plan-deductible .table tr:first-child th, .plan-coinsurance .table tr:first-child th {
 	padding: 17px 8px;
 	border: 0;
 }
 
-.plan-maximums-and-deductibles .table tr th {
+.plan-maximums-and-deductibles .table tr th, .plan-deductible .table tr th, .plan-coinsurance .table tr th {
 	border-bottom: 0;
 	border-top: 0;
 }
 
-.plan-maximums-and-deductibles .table td:nth-child(2n+4) {
+.plan-maximums-and-deductibles .table td:nth-child(2n+4), .plan-deductible .table td:nth-child(2n+4), .plan-coinsurance .table td:nth-child(2n+4) {
 	background: #fcf8e3;
 }
 
-.plan-maximums-and-deductibles .table td:nth-child(2n+4):hover {
+.plan-maximums-and-deductibles .table td:nth-child(2n+4):hover, .plan-deductible .table td:nth-child(2n+4):hover, .plan-coinsurance .table td:nth-child(2n+4):hover {
 	background: #faf2cc;
 }
 
