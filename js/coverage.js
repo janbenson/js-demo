@@ -1,4 +1,4 @@
-var coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
+var coverage_url = "https://staginggds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
@@ -517,11 +517,9 @@ buildInsuranceSection4 = function (service_providers) {
   $("<th/>", {text: "Additional Information"}).appendTo(rowHead);
 
   $.each(service_providers['physicians'], function (idx, item) {
-    var row = $("<tr></tr>");
+    $.each(item['contact_details'], function(i, contact) {
+      var row = $("<tr></tr>");
 
-    var contact = item['contact_details'][0];
-
-    if (contact) {
       $("<td/>", {text: ""}).appendTo(row);
       $("<td/>", {text: contact['entity_code_label']}).appendTo(row);
       $("<td/>", {text: parseName(contact)}).appendTo(row);
@@ -530,7 +528,7 @@ buildInsuranceSection4 = function (service_providers) {
 
       tableBody.append(row);
       row.appendTo(tableBody);
-    }
+    });
   });
 
   if ($(tableBody).children().length > 0) {
