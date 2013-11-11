@@ -1,4 +1,4 @@
-var coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
+var coverage_url = "https://staginggds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
