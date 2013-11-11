@@ -1,4 +1,4 @@
-var coverage_url = "https://staginggds.eligibleapi.com/v1.3/coverage/all.json"
+var coverage_url = "https://gds.eligibleapi.com/v1.3/coverage/all.json"
 
 showForm = function () {
   $(".test-param").hide();
@@ -297,7 +297,21 @@ buildCoverageHTML = function (data) {
 
     //Adding links to additional insurance information
     $.each(data['plan']['additional_insurance_policies'], function (index, policy) {
-      additionalInsuranceSection.append('<a href="#insurance-' + index + '">' + policy['insurance_type_label'] + ' </a><br/>');
+      var policy_name;
+      policy_name = policy['insurance_type_label'];
+      if (policy_name == null || policy_name.length <= 0) {
+        policy_name = policy['coverage_description'];
+      }
+      if ((policy_name == null || policy_name.length <= 0) && (policy['comments'].length > 0)) {
+        policy_name = policy['comments'][0];
+      }
+      if ((policy_name == null || policy_name.length <= 0) && (policy['contact_details'].length > 0)) {
+        policy_name = policy['contact_details'][0]['last_name'] || policy['contact_details'][0]['first_name'];
+      }
+      if (policy_name == null || policy_name.length <= 0) {
+        policy_name = "Policy #" + (index + 1);
+      }
+      additionalInsuranceSection.append('<a href="#insurance-' + index + '">' + policy_name + ' </a><br/>');
     });
   }
 
