@@ -428,7 +428,7 @@ buildInsuranceSection2 = function (plan) {
   var row = $("<tr></tr>").appendTo(tableBody).addClass("warning");
 
   $("<th/>", {text: "Coverage"}).appendTo(rowHead);
-  $("<td/>", {text: coverageStatus(plan)}).addClass("coverage-status-text").appendTo(row);
+  $("<td/>", {text: plan['coverage_status_label']}).addClass("coverage-status-text").appendTo(row);
 
   $("<th/>", {text: "Type"}).appendTo(rowHead);
   $("<td/>", {text: plan['plan_type_label']}).appendTo(row);
