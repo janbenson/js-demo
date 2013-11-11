@@ -245,7 +245,7 @@ buildCoverageHTML = function (data) {
     coverageSection.append(buildPanelUI('Additional Insurance Policies', buildAdditionalInsurancePolicies(data['plan']['additional_insurance_policies'])));
 
     additionalInsuranceSection = $("<section/>").
-      addClass('additional-insurance-section').
+      addClass('additional-insurance-section').addClass("alert alert-warning fade in").
       append('<p>Other insurance policies were found. Click below to see details</p>');
   }
 
