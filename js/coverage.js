@@ -464,6 +464,7 @@ buildInsuranceSection3 = function (plan, subscriber) {
     var eligibleDates = getTypeSpecificDates(plan['dates'], "eligibilty");
     var planDates = getTypeSpecificDates(plan['dates'], "plan");
     var serviceDates = getTypeSpecificDates(plan['dates'], "service");
+    var policyDates = getTypeSpecificDates(plan['dates'], "policy_effective");
 
     if (eligibleDates && eligibleDates.length > 0) {
       dates.push("Eligible: " + eligibleDates);
@@ -475,6 +476,10 @@ buildInsuranceSection3 = function (plan, subscriber) {
 
     if (serviceDates && serviceDates.length > 0) {
       dates.push("Service: " + serviceDates);
+    }
+
+    if (policyDates && policyDates.length > 0) {
+      dates.push("Policy Effective: " + serviceDates);
     }
   }
   $("<td/>", {html: dates.join("<br/>")}).appendTo(row);
